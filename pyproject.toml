@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csbluegem.py"
+description = "An async wrapper for the CSBlueGem api."
+readme = "README.md"
+authors = [{ name = "fretgfr", email = "fretgfr@sudomail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["csbluegem", "counter strike", "api wrapper"]
+dependencies = ["aiohttp>=3.7.4,<4"]
+requires-python = ">=3.8"
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = ["black", "isort", "typing_extensions"]
+docs = ["sphinx", "sphinx-rtd-theme"]
+
+[project.urls]
+Homepage = "https://github.com/fretgfr/csbluegem.py/"
+Documentation = "https://csbluegem.readthedocs.io/en/latest/"
+Issues = "https://github.com/fretgfr/csbluegem.py/issues"
+
+[tool.setuptools]
+packages = ["csbluegem"]
+
+[tool.setuptools.dynamic]
+version = { attr = "csbluegem.meta.__version__" }
+
+[tool.black]
+line-length = 125
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+combine_star = true
+line_length = 125
+
+[tool.pyright]
+typeCheckingMode = "standard"
