@@ -19,23 +19,23 @@ csbluegem.types module
    :members:
    :show-inheritance:
 
-..autoclass:: csbluegem.types.Screenshots
+.. autoclass:: csbluegem.types.Screenshots
    :members:
    :show-inheritance:
 
-..autoclass:: csbluegem.types.PatternData
+.. autoclass:: csbluegem.types.PatternData
    :members:
    :show-inheritance:
 
-..autoclass:: csbluegem.types.SaleMeta
+.. autoclass:: csbluegem.types.SaleMeta
    :members:
    :show-inheritance:
 
-..autoclass:: csbluegem.types.SearchResponse
+.. autoclass:: csbluegem.types.SearchResponse
    :members:
    :show-inheritance:
 
-..autoclass:: csbluegem.types.SaleOrigin
+.. autoclass:: csbluegem.types.SaleOrigin
    :members:
    :show-inheritance:
 
