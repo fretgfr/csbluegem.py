@@ -25,7 +25,7 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Literal, NamedTuple, NotRequired, Optional, TypedDict
+from typing import List, Literal, NotRequired, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
@@ -315,7 +315,8 @@ class Sale:
         return self.type == "stattrak"
 
 
-class SearchResponse(NamedTuple):
+@dataclass
+class SearchResponse:
     """Represents a response to a search query.
 
     Attributes
@@ -325,6 +326,8 @@ class SearchResponse(NamedTuple):
     sales: List[:class:`~csbluegem.types.Sale`]
         The sales that were returned.
     """
+
+    __slots__ = ("meta", "sales")
 
     meta: SearchMeta
     sales: List[Sale]
