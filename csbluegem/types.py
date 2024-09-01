@@ -29,7 +29,7 @@ from typing import List, Literal, NamedTuple, NotRequired, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
-__all__ = ("Screenshots", "PatternData", "SearchMeta", "Sale", "SearchResponse")
+__all__ = ("Screenshots", "PatternData", "SearchMeta", "Sale", "SearchResponse", "SaleOrigin")
 
 
 class _APISearchMetaDict(TypedDict):
