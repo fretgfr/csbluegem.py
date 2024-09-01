@@ -24,14 +24,16 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
-from typing import Any, Dict, Literal, Optional, TypedDict, Union
+from typing import List, Literal, NamedTuple, NotRequired, Optional, TypedDict
 
-from .utils import parse_date, utcnow
+from .utils import parse_epoch, utcnow
 
-__all__ = (
-    "Screenshots",
-    "Sale",
-)
+__all__ = ("Screenshots", "PatternData", "SaleMeta", "Sale", "SearchResponse")
+
+
+class _APISearchMetaDict(TypedDict):
+    count: int
+    size: int
 
 
 class _APIPatternDataDict(TypedDict):
@@ -49,35 +51,47 @@ class _APIPatternDataDict(TypedDict):
     playside_purple: float
 
 
-class _APISaleDataDict(TypedDict):
-    date: str
-    origin: str
-    inspect: str
-    price: float
-
-
 class _APIScreenshotsDict(TypedDict):
     inspect: Optional[str]
     inspect_playside: Optional[str]
     inspect_backside: Optional[str]
 
 
+class _APISearchSaleDict(TypedDict):
+    sale_id: str
+    origin: str
+    buff_id: int
+    date: str
+    pattern: int
+    float: float
+    price: float
+    epoch: int
+    type: str
+    screenshots: _APIScreenshotsDict
+    pattern_data: NotRequired[_APIPatternDataDict]
+    csfloat: str
+
+
+class _APISearchResponseDict(TypedDict):
+    meta: _APISearchMetaDict
+    sales: List[_APISearchSaleDict]
+
+
 @dataclass
 class Screenshots:
-    __slots__ = ("sale", "_inspect", "inspect_playside", "inspect_backside")
+    __slots__ = ("_inspect", "inspect_playside", "inspect_backside")
 
-    sale: Sale
     _inspect: Optional[str]
     inspect_playside: Optional[str]
     inspect_backside: Optional[str]
 
     @classmethod
-    def _from_data(cls, sale: Sale, /, *, data: _APIScreenshotsDict):
+    def _from_data(cls, data: _APIScreenshotsDict, /):
         inspect = data["inspect"]
         inspect_playside = data["inspect_playside"]
         inspect_backside = data["inspect_backside"]
 
-        return cls(sale, inspect, inspect_playside, inspect_backside)
+        return cls(inspect, inspect_playside, inspect_backside)
 
     @property
     def inspect(self) -> str:
@@ -127,69 +141,99 @@ class PatternData:
     playside_purple: float
 
     @classmethod
-    def _from_data(cls, data: _APIPatternDataDict):
+    def _from_data(cls, data: _APIPatternDataDict, /):
         return cls(**data)
 
 
 @dataclass
-class SaleData:
-    __slots__ = ("timestamp", "origin", "inspect", "price")
+class SaleMeta:
+    __slots__ = ("count", "max_sale", "min_sale", "size")
 
-    timestamp: datetime.datetime
-    origin: str
-    inspect: str
-    price: float
+    count: int
+    size: int
 
     @classmethod
-    def _from_data(cls, data: _APISaleDataDict):
-        date = parse_date(data["date"])
-        origin = data["origin"]
-        inspect = data["inspect"]
-        price = data["price"]
+    def _from_data(cls, data: _APISearchMetaDict, /):
+        count = data["count"]
+        size = data["size"]
 
-        return cls(date, origin, inspect, price)
+        return cls(count, size)
+
+
+@dataclass
+class Sale:
+    __slots__ = (
+        "buff_id",
+        "csfloat",
+        "_float",
+        "type",
+        "pattern",
+        "timestamp",
+        "origin",
+        "pattern_data",
+        "screenshots",
+    )
+
+    buff_id: int
+    csfloat: str
+    _float: float
+    type: str
+    pattern: int
+    timestamp: datetime.datetime
+    origin: str
+    pattern_data: Optional[PatternData]
+    screenshots: Screenshots
+
+    @classmethod
+    def _from_dict(cls, data: _APISearchSaleDict):
+        buff_id = data["buff_id"]
+        csfloat = data["csfloat"]
+        _float = data["float"]
+        type = data["type"]
+        api_pattern = data["pattern"]
+        timestamp = parse_epoch(data["epoch"])
+        origin = data["origin"]
+
+        raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
+        pattern_data = PatternData._from_data(raw_pattern_data) if raw_pattern_data is not None else None
+
+        raw_screenshots_data: _APIScreenshotsDict = data["screenshots"]
+        screenshots = Screenshots._from_data(raw_screenshots_data)
+
+        return cls(buff_id, csfloat, _float, type, api_pattern, timestamp, origin, pattern_data, screenshots)
+
+    @property
+    def float(self):
+        return self._float
 
     @property
     def date(self) -> datetime.date:
         return self.timestamp.date()
 
     @property
-    def days_since(self) -> int:
-        """The number of days since this sale."""
-        return (utcnow() - self.timestamp).days
-
-
-@dataclass
-class Sale:
-    __slots__ = ("_float", "is_stattrak", "pattern", "origin", "date", "price")
-
-    buff_id: int
-    csfloat: str
-    _float: float
-    is_stattrak: bool
-    pattern: int
-    pattern_data: Optional[PatternData]
-    sale_data: Optional[SaleData]
-
-    @classmethod
-    def _from_dict(cls, data: Dict[str, Any]):
-        buff_id = data["buff_id"]
-        csfloat = data["csfloat"]
-        _float = data["float"]
-        is_stattrak = data["isStattrak"]
-        api_pattern = data["pattern"]
-
-        raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
-        pattern_data = PatternData._from_data(raw_pattern_data) if raw_pattern_data is not None else None
-
-        raw_sale_data: Optional[_APISaleDataDict] = data.get("sale_data")
-        sale_data = SaleData._from_data(raw_sale_data) if raw_sale_data is not None else None
-
-        return cls(buff_id, csfloat, _float, is_stattrak, api_pattern, pattern_data, sale_data)
+    def epoch(self) -> float:
+        return self.timestamp.timestamp()
 
     @property
-    def float(self):
-        return self._float
+    def days_since(self) -> int:
+        """Returns the number of days since this Sale."""
+        return (utcnow() - self.timestamp).days
+
+    @property
+    def is_stattrack(self):
+        return self.type == "stattrak"
+
+
+class SearchResponse(NamedTuple):
+    meta: SaleMeta
+    sales: List[Sale]
+
+    @classmethod
+    def _from_data(cls, data: _APISearchResponseDict):
+        meta = SaleMeta._from_data(data["meta"])
+        sales = [Sale._from_dict(d) for d in data["sales"]]
+
+        return cls(meta, sales)
 
 
 BlueGemItem = Literal[
