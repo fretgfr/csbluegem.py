@@ -2,7 +2,7 @@ An asynchronous wrapper for the [CSBlueGem](https://csbluegem.com) API.
 
 # Quickstart
 
-Install from pypi: `python3 -m pip install csbluegem.py`
+Install from PyPi: `python3 -m pip install csbluegem.py`
 
 ```py
 import asyncio
