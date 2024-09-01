@@ -36,6 +36,7 @@ csbluegem.types module
    :show-inheritance:
 
 .. class:: Origin
+
     Where this information comes from.
 
    .. attribute:: Buff
@@ -52,6 +53,7 @@ csbluegem.types module
        BroSkins.com
 
 .. class:: FilterType
+
    What type of filter to apply.
 
    .. attribute:: PlaysideBlue
@@ -78,6 +80,7 @@ csbluegem.types module
    :show-inheritance:
 
 .. class:: Order
+
    How to order the results.
 
    .. attribute:: Asc
@@ -88,6 +91,7 @@ csbluegem.types module
        Sort in descending order.
 
 .. class:: ItemType
+
    The type of an item.
 
    .. attribute:: StatTrak
@@ -98,6 +102,7 @@ csbluegem.types module
        A non StatTrak item.
 
 .. class:: Currency
+
    The currency for prices to be returned in.
 
    .. attribute:: USD
@@ -122,6 +127,7 @@ csbluegem.types module
        Canadian Dollar
 
 .. class:: SortKey
+
    How to sort returned results.
 
    .. attribute:: PlaysideBlue
@@ -164,9 +170,11 @@ csbluegem.types module
 
        The date of the sale.
    .. attribute:: Price
+
        The price of the sale.
 
 .. class:: BlueGemItem
+
    Available blue gem items.
 
    .. attribute:: AK47
@@ -243,6 +251,7 @@ csbluegem.types module
        Ursus Knife
 
 .. class:: BlueGemKnife
+
    Available blue gem knives.
 
    .. attribute:: Bayonet
