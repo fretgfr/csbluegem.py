@@ -30,8 +30,8 @@ import aiohttp
 
 from .errors import BadArgument
 from .http import HTTPClient, Route
-from .types import BlueGemItem, BlueGemKnives, Currency, Filter, ItemType, Order, Origin, Sale, SortKey
-from .utils import _is_valid_float, _is_valid_pricecheck_pattern, _is_valid_search_pattern, utcnow
+from .types import BlueGemItem, BlueGemKnife, Currency, Filter, ItemType, Order, Origin, Sale, SortKey
+from .utils import _is_valid_float, _is_valid_pricecheck_pattern, _is_valid_search_pattern
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -60,23 +60,21 @@ class Client:
     async def search(
         self,
         skin: BlueGemItem,
-        currency: Currency = "USD",
-        type: ItemType = "any",
-        pattern: int = -1,
+        currency: Currency = Currency.USD,
+        type: Optional[ItemType] = None,
+        pattern: Optional[int] = None,
         price_min: float = 0,
         price_max: float = 9999999999.99,
         float_min: float = 0,
         float_max: float = 1,
-        sort_key: SortKey = "date",
-        sort: Order = "descending",
-        origin: Origin = "any",
-        filter0: Filter = "playside_blue",
-        filter0_min: int = 0,
-        filter0_max: int = 999,
+        sort: SortKey = SortKey.Date,
+        order: Order = Order.Desc,
+        origin: Optional[Origin] = None,
         date_min: Optional[datetime.datetime] = None,
         date_max: Optional[datetime.datetime] = None,
-        limit: Optional[int] = None,  # TODO Doc
-        offset: Optional[int] = None,  # TODO Doc
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        *filters: Filter,
     ) -> List[Sale]:
         """Searches for an item on CSBlueGem.
 
@@ -85,35 +83,35 @@ class Client:
         skin: BlueGemItem
             The skin to search for.
         currency: Currency, optional
-            The currency to return, by default "USD"
+            The currency to return, by default USD.
         type: ItemType, optional
-            The item's type, by default "any"
+            The item's type, None for any. By default None.
         pattern: :class:`int`, optional
-            The items pattern. -1 for any pattern, by default -1
+            The items pattern. None for any pattern. By default None.
         price_min: :class:`float`, optional
-            The minimum price of the sale, by default 0
+            The minimum price of the sale, by default `0`.
         price_max: :class:`float`, optional
-            The maximum price of the sale, by default 9999999999.99
+            The maximum price of the sale, by default `9999999999.99`.
         float_min: :class:`float`, optional
-            The minimum float of a returned item, by default 0
+            The minimum float of a returned item, by default `0`.
         float_max: :class:`float`, optional
-            The maximum float of a returned item, by default 1
+            The maximum float of a returned item, by default `1`.
         sort_key: SortKey, optional
-            How should the results be sorted, by default "date"
+            How should the results be sorted, by default Date.
         sort: Order, optional
-            How to order the results, by default "descending"
+            How to order the results, by default DESC.
         origin: Origin, optional
-            Where the sales originated from, by default "any"
-        filter0: Filter, optional
-            Additional filter criteria, by default "playside_blue"
-        filter0_min: :class:`int`, optional
-            Parameter for additional filter criteria, by default 0
-        filter0_max: :class:`int`, optional
-            Parameter for additional filter criteria, by default 999
+            Where the sales originated from, None for any. By default None.
         date_min: Optional[:class:`datetime.datetime`], optional
-            The earliest a sale can be from, None for no minimum, by default None
+            The earliest a sale can be from, None for no minimum, by default None.
         date_max: Optional[:class:`datetime.datetime`], optional
-            The latest a sale can be from, None for no maximum, by default None
+            The latest a sale can be from, None for no maximum, by default None.
+        limit: Optional[:class:`int`], optional
+            The maximum number of results to return. None for no limit. By default None.
+        offset: Optional[:class:`int`], optional
+            The offset to start returning results from. None for no offset. By default None.
+        filters: :class:`~csbluegem.types.Filter`
+            Filters to apply to the search.
 
         Returns
         -------
@@ -138,20 +136,17 @@ class Client:
             raise BadArgument("pattern is invalid")
 
         params = {
-            "skin": skin,
-            "currency": currency,
-            "type": type,
+            "skin": skin.value,
+            "currency": currency.value,
+            "type": type.value if type else None,
             "pattern": pattern,
             "price_min": price_min,
             "price_max": price_max,
             "float_min": float_min,
             "float_max": float_max,
-            "sort_key": sort_key,
-            "sort": sort,
-            "origin": origin,
-            "filter0": filter0,
-            "filter0_min": filter0_min,
-            "filter0_max": filter0_max,
+            "sort": sort.value,
+            "order": order.value,
+            "origin": origin.value if origin else None,
         }
 
         if date_min is not None:
@@ -160,12 +155,28 @@ class Client:
         if date_max is not None:
             params["date_max"] = date_max.timestamp()
 
+        if limit is not None:
+            params["limit"] = limit
+
+        if offset is not None:
+            params["offset"] = offset
+
+        for filter in filters:
+            if not filter._is_valid():
+                raise BadArgument(f"a provided filter is invalid: {filter!r}")
+
+            params[f"{filter.type.value}_min"] = filter.min
+            params[f"{filter.type}_max"] = filter.max
+
         r = Route("GET", "/search")
         data = await self.http.request(r, params=params)
 
         return [Sale._from_dict(d) for d in data]
 
-    async def pricecheck(self, knife: BlueGemKnives, pattern: int, float: float) -> int:
+    async def pattern_data(self):
+        raise NotImplementedError()
+
+    async def pricecheck(self, knife: BlueGemKnife, pattern: int, float: float) -> int:
         """Runs a price check for an item.
 
         Parameters
@@ -200,7 +211,7 @@ class Client:
             raise BadArgument("provided float is invalid.")
 
         params = {
-            "skin": knife,
+            "skin": knife.value,
             "pattern": pattern,
             "float": float,
         }

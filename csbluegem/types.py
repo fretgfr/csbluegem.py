@@ -25,11 +25,26 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Literal, NotRequired, Optional, TypedDict
+from typing import List, NotRequired, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
-__all__ = ("Screenshots", "PatternData", "SearchMeta", "Sale", "SearchResponse", "SaleOrigin")
+__all__ = (
+    "Screenshots",
+    "PatternData",
+    "SearchMeta",
+    "Sale",
+    "SearchResponse",
+    "Origin",
+    "FilterType",
+    "Filter",
+    "Order",
+    "ItemType",
+    "Currency",
+    "SortKey",
+    "BlueGemItem",
+    "BlueGemKnife",
+)
 
 
 class _APISearchMetaDict(TypedDict):
@@ -60,7 +75,7 @@ class _APIScreenshotsDict(TypedDict):
 
 class _APISearchSaleDict(TypedDict):
     sale_id: str
-    origin: SaleOrigin
+    origin: Origin
     buff_id: int
     date: str
     pattern: int
@@ -76,15 +91,6 @@ class _APISearchSaleDict(TypedDict):
 class _APISearchResponseDict(TypedDict):
     meta: _APISearchMetaDict
     sales: List[_APISearchSaleDict]
-
-
-class SaleOrigin(Enum):
-    """Where a :class:`~csbluegem.types.Sale` originated from."""
-
-    Buff = "Buff"
-    CSFloat = "CSFloat"
-    SkinBid = "SkinBid"
-    BroSkins = "BroSkins"
 
 
 @dataclass
@@ -267,7 +273,7 @@ class Sale:
     type: str
     pattern: int
     timestamp: datetime.datetime
-    origin: SaleOrigin
+    origin: Origin
     pattern_data: Optional[PatternData]
     screenshots: Screenshots
 
@@ -279,7 +285,7 @@ class Sale:
         type = data["type"]
         api_pattern = data["pattern"]
         timestamp = parse_epoch(data["epoch"])
-        origin = SaleOrigin(data["origin"])
+        origin = Origin(data["origin"])
 
         raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
         pattern_data = PatternData._from_data(raw_pattern_data) if raw_pattern_data is not None else None
@@ -340,88 +346,116 @@ class SearchResponse:
         return cls(meta, sales)
 
 
-BlueGemItem = Literal[  # TODO Should probably be an enum
-    "AK-47",
-    "Bayonet",
-    "Bowie Knife",
-    "Butterfly Knife",
-    "Classic Knife",
-    "Falchion Knife",
-    "Five-SeveN",
-    "Flip Knife",
-    "Gut Knife",
-    "Huntsman Knife",
-    "Hydra Gloves",
-    "Karambit",
-    "Kukri Knife",
-    "M9 Bayonet",
-    "MAC-10",
-    "Navaja Knife",
-    "Nomad Knife",
-    "Paracord Knife",
-    "Shadow Daggers",
-    "Skeleton Knife",
-    "Stiletto Knife",
-    "Survival Knife",
-    "Talon Knife",
-    "Ursus Knife",
-]
+class Origin(Enum):
+    """Where a :class:`~csbluegem.types.Sale` originated from."""
+
+    Buff = "Buff"
+    CSFloat = "CSFloat"
+    SkinBid = "SkinBid"
+    BroSkins = "BroSkins"
 
 
-Filter = Literal[
-    "playside_blue",
-    "playside_purple",
-    "playside_gold",
-    "backside_blue",
-    "backside_purple",
-    "backside_gold",
-    "playside_contour_blue",
-    "playside_contour_purple",
-    "backside_contour_blue",
-    "backside_contour_purple",
-]
+class FilterType(Enum):
+    PlaysideBlue = "playside_blue"
+    PlaysidePurple = "playside_purple"
+    PlaysideGold = "playside_gold"
+    BacksideBlue = "backside_blue"
+    BacksidePurple = "backside_purple"
+    BacksideGold = "backside_gold"
 
-Order = Literal["ascending", "descending"]  # TODO Should probably be an enum
-ItemType = Literal["any", "stattrack", "normal"]  # TODO Should probably be an enum
-Currency = Literal["USD", "EUR", "JPY", "GBP", "CNY", "AUD", "CAD"]  # TODO Should probably be an enum
-Origin = Literal["any", "Buff", "CSFloat", "SkinBid", "BroSkins"]  # TODO Should probably be an enum
 
-SortKey = Literal[  # TODO Should probably be an enum
-    "playside_blue",
-    "playside_purple",
-    "playside_gold",
-    "backside_blue",
-    "backside_purple",
-    "backside_gold",
-    "playside_contour_blue",
-    "playside_contour_purple",
-    "backside_contour_blue",
-    "backside_contour_purple",
-    "pattern",
-    "float",
-    "date",
-    "price",
-]
+class Filter:
+    def __init__(self, type: FilterType, min: float, max: float):
+        self.type = type
+        self.min = min
+        self.max = max
 
-BlueGemKnives = Literal[  # TODO Should probably be an enumO
-    "Bayonet",
-    "Bowie Knife",
-    "Butterfly Knife",
-    "Classic Knife",
-    "Falchion Knife",
-    "Flip Knife",
-    "Gut Knife",
-    "Huntsman Knife",
-    "Karambit",
-    "Kukri Knife",
-    "M9 Bayonet",
-    "Navaja Knife",
-    "Nomad Knife",
-    "Paracord Knife",
-    "Shadow Daggers",
-    "Skeleton Knife",
-    "Stiletto Knife",
-    "Survival Knife",
-    "Talon Knife",
-    "Ursus Knife",
-]
+    def _is_valid(self):
+        return (0 <= self.min < 100 and 0 < self.max <= 100) and self.max > self.min
+
+
+class Order(Enum):
+    Asc = "ASC"
+    Desc = "DESC"
+
+
+class ItemType(Enum):
+    StatTrak = "stattrack"
+    Normal = "normal"
+
+
+class Currency(Enum):
+    USD = "USD"
+    EUR = "EUR"
+    JPY = "JPY"
+    GBP = "GBP"
+    CNY = "CNY"
+    AUD = "AUD"
+    CAD = "CAD"
+
+
+class SortKey(Enum):
+    PlaysideBlue = "playside_blue"
+    PlaysidePurple = "playside_purple"
+    PlaysideGold = "playside_gold"
+    BacksideBlue = "backside_blue"
+    BacksidePurple = "backside_purple"
+    BacksideGold = "backside_Gold"
+    PlaysideContourBlue = "playside_contour_blue"
+    PlaysideContourPurple = "playside_contour_purple"
+    BacksideContourBlue = "backside_contour_blue"
+    BacksideContourPurple = "backside_contour_purple"
+    Pattern = "pattern"
+    Float = "float"
+    Date = "date"
+    Price = "price"
+
+
+class BlueGemItem(Enum):
+    AK47 = "AK-47"
+    Bayonet = "Bayonet"
+    BowieKnife = "Bowie Knife"
+    ButterflyKnife = "Butterfly Knife"
+    ClassicKnife = "Classic Knife"
+    FalchionKnife = "Falchion Knife"
+    FiveSeveN = "Five-SeveN"
+    FlipKnife = "Flip Knife"
+    GutKnife = "Gut Knife"
+    HuntsmanKnife = "Huntsman Knife"
+    HydraGloves = "Hydra Gloves"
+    Karambit = "Karambit"
+    KukriKnife = "Kukri Knife"
+    M9Bayonet = "M9 Bayonet"
+    MAC10 = "MAC-10"
+    NavajaKnife = "Navaja Knife"
+    NomadKnife = "Nomad Knife"
+    ParacordKnife = "Paracord Knife"
+    ShadowDaggers = "Shadow Daggers"
+    SkeletonKnife = "Skeleton Knife"
+    StilettoKnife = "Stiletto Knife"
+    SurvivalKnife = "Survival Knife"
+    TalonKnife = "Talon Knife"
+    UrsusKnife = "Ursus Knife"
+
+
+class BlueGemKnife(Enum):
+    Bayonet = "Bayonet"
+    BowieKnife = "Bowie Knife"
+    ButterflyKnife = "Butterfly Knife"
+    ClassicKnife = "Classic Knife"
+    FalchionKnife = "Falchion Knife"
+    FlipKnife = "Flip Knife"
+    GutKnife = "Gut Knife"
+    HuntsmanKnife = "Huntsman Knife"
+    Karambit = "Karambit"
+    KukriKnife = "Kukri Knife"
+    M9Bayonet = "M9 Bayonet"
+    NavajaKnife = "Navaja Knife"
+    NomadKnife = "Nomad Knife"
+    ParacordKnife = "Paracord Knife"
+    ShadowDaggers = "Shadow Daggers"
+    SkeletonKnife = "Skeleton Knife"
+    StilettoKnife = "Stiletto Knife"
+    SurvivalKnife = "Survival Knife"
+    TalonKnife = "Talon Knife"
+    UrsusKnife = "Ursus Knife"
