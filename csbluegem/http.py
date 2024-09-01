@@ -56,18 +56,18 @@ def to_string(data: Dict[Any, Any]) -> str | bytes:
 
 
 class Route:
-    """Represents a Route for the api."""
+    """Represents a route for the API."""
 
     __slots__ = ("method", "path")
 
     def __init__(self, method: HTTP_METHOD, path: str) -> None:
-        """An API Route definition.
+        """An API route definition.
 
         Parameters
         ----------
-        method : HTTP_METHOD
+        method: HTTP_METHOD
             The method the route requires.
-        path : str
+        path: str
             The route's path.
         """
         self.method = method
