@@ -79,6 +79,8 @@ class _APISearchResponseDict(TypedDict):
 
 
 class SaleOrigin(Enum):
+    """Where a :class:`~csbluegem.types.Sale` originated from."""
+
     Buff = "Buff"
     CSFloat = "CSFloat"
     SkinBid = "SkinBid"
