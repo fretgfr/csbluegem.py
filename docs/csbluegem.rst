@@ -19,6 +19,22 @@ csbluegem.types module
    :members:
    :show-inheritance:
 
+..autoclass:: csbluegem.types.Screenshots
+   :members:
+   :show-inheritance:
+
+..autoclass:: csbluegem.types.PatternData
+   :members:
+   :show-inheritance:
+
+..autoclass:: csbluegem.types.SaleMeta
+   :members:
+   :show-inheritance:
+
+..autoclass:: csbluegem.types.SearchResponse
+   :members:
+   :show-inheritance:
+
 
 csbluegem.utils module
 --------------------
