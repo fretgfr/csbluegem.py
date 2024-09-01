@@ -365,6 +365,18 @@ class FilterType(Enum):
 
 
 class Filter:
+    """A filter for searches.
+
+    Attributes
+    ----------
+    type: :class:`~csbluegem.types.FilterType`
+        What kind of filter.
+    min: :class:`float`
+        The minimum value for this filter.
+    max: :class:`float`
+        The maximum value for this filter.
+    """
+
     def __init__(self, type: FilterType, min: float, max: float):
         self.type = type
         self.min = min
