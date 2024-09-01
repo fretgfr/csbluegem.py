@@ -35,6 +35,10 @@ csbluegem.types module
    :members:
    :show-inheritance:
 
+..autoclass:: csbluegem.types.SaleOrigin
+   :members:
+   :show-inheritance:
+
 
 csbluegem.utils module
 --------------------

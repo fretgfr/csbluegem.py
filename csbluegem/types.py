@@ -24,16 +24,17 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Literal, NamedTuple, NotRequired, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
-__all__ = ("Screenshots", "PatternData", "SaleMeta", "Sale", "SearchResponse")
+__all__ = ("Screenshots", "PatternData", "SearchMeta", "Sale", "SearchResponse")
 
 
 class _APISearchMetaDict(TypedDict):
-    count: int
     size: int
+    total: int
 
 
 class _APIPatternDataDict(TypedDict):
@@ -59,7 +60,7 @@ class _APIScreenshotsDict(TypedDict):
 
 class _APISearchSaleDict(TypedDict):
     sale_id: str
-    origin: str
+    origin: SaleOrigin
     buff_id: int
     date: str
     pattern: int
@@ -77,8 +78,29 @@ class _APISearchResponseDict(TypedDict):
     sales: List[_APISearchSaleDict]
 
 
+class SaleOrigin(Enum):
+    Buff = "Buff"
+    CSFloat = "CSFloat"
+    SkinBid = "SkinBid"
+    BroSkins = "BroSkins"
+
+
 @dataclass
 class Screenshots:
+    """Screenshots for a :class:`~csbluegem.types.Sale`.
+
+    Attributes
+    ----------
+    inspect: :class:`str`
+        A url to an inspect link. Always returns a url for an inspect link.
+
+        For CSFloat based sales, this returns the playside inspect link.
+    inspect_playside: Optional[:class:`str`]
+        A url to the playside inspect link. Only applicable for CSFloat sales.
+    inspect_backside: Optional[:class:`str`]
+        A url to the backside inspect link. Only applicable for CSFloat sales.
+    """
+
     __slots__ = ("_inspect", "inspect_playside", "inspect_backside")
 
     _inspect: Optional[str]
@@ -111,6 +133,35 @@ class Screenshots:
 
 @dataclass
 class PatternData:
+    """Data for a pattern on CSBlueGem.
+
+    Attributes
+    ----------
+    aq_oiled: :class:`str`
+        A URL to a screenshot with the skin over the aq oiled template.
+    backside_blue: :class:`float`
+        The percentage of blue visible on the back side.
+    backside_contour_blue: :class:`int`
+        The number of individual blue sections visible on the back side.
+    backside_contour_purple: :class:`int`
+        The number of individual purple sections visible on the back side.
+    backside_gold: :class:`float`
+        The percentage of gold visible on the back side.
+    backside_purple: :class:`float`
+        The percentage of purple visible on the back side.
+    csbluegem_screenshot: :class:`str`
+        A URL to a sample screenshot of the pattern.
+    playside_blue: :class:`float`
+        The percentage of blue visible on the back side.
+    playside_contour_blue: :class:`int`
+        The number of individual blue sections visible on the play side.
+    playside_contour_purple: :class:`int`
+        The number of individual purple sections visible on the play side.
+    playside_gold: :class:`float`
+        The percentage of gold visible on the play side.
+    playside_purple: :class:`float`
+        The percentage of purple visible on the play side.
+    """
 
     __slots__ = (
         "aq_oiled",
@@ -146,22 +197,56 @@ class PatternData:
 
 
 @dataclass
-class SaleMeta:
+class SearchMeta:
+    """Metadata about the search.
+
+    Attributes
+    ----------
+    size: :class:`int`
+        The number of items returned.
+    total: :class:`int`
+        The total number of items available.
+    """
+
     __slots__ = ("count", "max_sale", "min_sale", "size")
 
-    count: int
     size: int
+    total: int
 
     @classmethod
     def _from_data(cls, data: _APISearchMetaDict, /):
-        count = data["count"]
         size = data["size"]
+        total = data["total"]
 
-        return cls(count, size)
+        return cls(size, total)
 
 
 @dataclass
 class Sale:
+    """Represents a record of sale from CSBlueGem
+
+    Attributes
+    ----------
+    buff_id: :class:`int`
+        The id of the item on Buff.
+    csfloat: :class:`str`
+        A link to the item on CSFloat.
+    float: :class:`float`
+        The float of the item.
+    type: :class:`str`
+        The type of the item. Can either be "normal" or "stattrak".
+    pattern: :class:`int`
+        The pattern of the item.
+    timestamp: :class:`datetime.datetime`
+        When the sale occurred.
+    origin: :class:`~csbluegem.types.SaleOrigin`
+        Where the sale data originated.
+    pattern_data: Optional[:class:`~csbluegem.types.PatternData`]
+        The pattern data for the item, if available.
+    screenshots: :class:`~csbluegem.types.Screenshots`
+        Screenshot data for the item.
+    """
+
     __slots__ = (
         "buff_id",
         "csfloat",
@@ -180,7 +265,7 @@ class Sale:
     type: str
     pattern: int
     timestamp: datetime.datetime
-    origin: str
+    origin: SaleOrigin
     pattern_data: Optional[PatternData]
     screenshots: Screenshots
 
@@ -192,7 +277,7 @@ class Sale:
         type = data["type"]
         api_pattern = data["pattern"]
         timestamp = parse_epoch(data["epoch"])
-        origin = data["origin"]
+        origin = SaleOrigin(data["origin"])
 
         raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
         pattern_data = PatternData._from_data(raw_pattern_data) if raw_pattern_data is not None else None
@@ -204,14 +289,17 @@ class Sale:
 
     @property
     def float(self):
+        """The float of the item."""
         return self._float
 
     @property
     def date(self) -> datetime.date:
+        """The date this item was sold."""
         return self.timestamp.date()
 
     @property
     def epoch(self) -> float:
+        """The epoch the item was sold."""
         return self.timestamp.timestamp()
 
     @property
@@ -220,47 +308,58 @@ class Sale:
         return (utcnow() - self.timestamp).days
 
     @property
-    def is_stattrack(self):
+    def is_stattrack(self) -> bool:
+        """Whether the item was stattrak"""
         return self.type == "stattrak"
 
 
 class SearchResponse(NamedTuple):
-    meta: SaleMeta
+    """Represents a response to a search query.
+
+    Attributes
+    ----------
+    meta: :class:`~csbluegem.types.SearchMeta`
+        Metadata about the query.
+    sales: List[:class:`~csbluegem.types.Sale`]
+        The sales that were returned.
+    """
+
+    meta: SearchMeta
     sales: List[Sale]
 
     @classmethod
     def _from_data(cls, data: _APISearchResponseDict):
-        meta = SaleMeta._from_data(data["meta"])
+        meta = SearchMeta._from_data(data["meta"])
         sales = [Sale._from_dict(d) for d in data["sales"]]
 
         return cls(meta, sales)
 
 
-BlueGemItem = Literal[
+BlueGemItem = Literal[  # TODO Should probably be an enum
     "AK-47",
     "Bayonet",
-    "Bowie_Knife",
-    "Butterfly_Knife",
-    "Classic_Knife",
-    "Falchion_Knife",
+    "Bowie Knife",
+    "Butterfly Knife",
+    "Classic Knife",
+    "Falchion Knife",
     "Five-SeveN",
-    "Flip_Knife",
-    "Gut_Knife",
-    "Huntsman_Knife",
-    "Hydra_Gloves",
+    "Flip Knife",
+    "Gut Knife",
+    "Huntsman Knife",
+    "Hydra Gloves",
     "Karambit",
-    "Kukri_Knife",
-    "M9_Bayonet",
+    "Kukri Knife",
+    "M9 Bayonet",
     "MAC-10",
-    "Navaja_Knife",
-    "Nomad_Knife",
-    "Paracord_Knife",
-    "Shadow_Daggers",
-    "Skeleton_Knife",
-    "Stiletto_Knife",
-    "Survival_Knife",
-    "Talon_Knife",
-    "Ursus_Knife",
+    "Navaja Knife",
+    "Nomad Knife",
+    "Paracord Knife",
+    "Shadow Daggers",
+    "Skeleton Knife",
+    "Stiletto Knife",
+    "Survival Knife",
+    "Talon Knife",
+    "Ursus Knife",
 ]
 
 
@@ -277,12 +376,12 @@ Filter = Literal[
     "backside_contour_purple",
 ]
 
-Order = Literal["ascending", "descending"]
-ItemType = Literal["any", "stattrack", "normal"]
-Currency = Literal["USD", "EUR", "JPY", "GBP", "CNY", "AUD", "CAD"]
-Origin = Literal["any", "Buff", "CSFloat", "SkinBid", "BroSkins"]
+Order = Literal["ascending", "descending"]  # TODO Should probably be an enum
+ItemType = Literal["any", "stattrack", "normal"]  # TODO Should probably be an enum
+Currency = Literal["USD", "EUR", "JPY", "GBP", "CNY", "AUD", "CAD"]  # TODO Should probably be an enum
+Origin = Literal["any", "Buff", "CSFloat", "SkinBid", "BroSkins"]  # TODO Should probably be an enum
 
-SortKey = Literal[
+SortKey = Literal[  # TODO Should probably be an enum
     "playside_blue",
     "playside_purple",
     "playside_gold",
@@ -299,25 +398,25 @@ SortKey = Literal[
     "price",
 ]
 
-BlueGemKnives = Literal[
+BlueGemKnives = Literal[  # TODO Should probably be an enumO
     "Bayonet",
-    "Bowie_Knife",
-    "Butterfly_Knife",
-    "Classic_Knife",
-    "Falchion_Knife",
-    "Flip_Knife",
-    "Gut_Knife",
-    "Huntsman_Knife",
+    "Bowie Knife",
+    "Butterfly Knife",
+    "Classic Knife",
+    "Falchion Knife",
+    "Flip Knife",
+    "Gut Knife",
+    "Huntsman Knife",
     "Karambit",
-    "Kukri_Knife",
-    "M9_Bayonet",
-    "Navaja_Knife",
-    "Nomad_Knife",
-    "Paracord_Knife",
-    "Shadow_Daggers",
-    "Skeleton_Knife",
-    "Stiletto_Knife",
-    "Survival_Knife",
-    "Talon_Knife",
-    "Ursus_Knife",
+    "Kukri Knife",
+    "M9 Bayonet",
+    "Navaja Knife",
+    "Nomad Knife",
+    "Paracord Knife",
+    "Shadow Daggers",
+    "Skeleton Knife",
+    "Stiletto Knife",
+    "Survival Knife",
+    "Talon Knife",
+    "Ursus Knife",
 ]

@@ -75,6 +75,8 @@ class Client:
         filter0_max: int = 999,
         date_min: Optional[datetime.datetime] = None,
         date_max: Optional[datetime.datetime] = None,
+        limit: Optional[int] = None,  # TODO Doc
+        offset: Optional[int] = None,  # TODO Doc
     ) -> List[Sale]:
         """Searches for an item on CSBlueGem.
 
