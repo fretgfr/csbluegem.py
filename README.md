@@ -2,6 +2,8 @@ An asynchronous wrapper for the [CSBlueGem](https://csbluegem.com) API.
 
 # Quickstart
 
+Install from pypi: `python3 -m pip install csbluegem.py`
+
 ```py
 import asyncio
 from textwrap import dedent
