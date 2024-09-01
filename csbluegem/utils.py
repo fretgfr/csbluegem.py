@@ -41,6 +41,10 @@ def parse_date(date_string: str, /) -> datetime.datetime:
     return datetime.datetime.strptime(date_string, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
 
 
+def parse_epoch(epoch: int, /) -> datetime.datetime:
+    return datetime.datetime.fromtimestamp(epoch, tz=datetime.timezone.utc)
+
+
 def utcnow() -> datetime.datetime:
     """Returns an aware UTC datetime representing the current time.
 
