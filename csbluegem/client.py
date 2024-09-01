@@ -30,7 +30,7 @@ import aiohttp
 
 from .errors import BadArgument
 from .http import HTTPClient, Route
-from .types import BlueGemItem, BlueGemKnife, Currency, Filter, ItemType, Order, Origin, Sale, SortKey
+from .types import BlueGemItem, BlueGemKnife, Currency, Filter, ItemType, Order, Origin, PatternData, Sale, SortKey
 from .utils import _is_valid_float, _is_valid_pricecheck_pattern, _is_valid_search_pattern
 
 if TYPE_CHECKING:
@@ -60,6 +60,7 @@ class Client:
     async def search(
         self,
         skin: BlueGemItem,
+        /,
         currency: Currency = Currency.USD,
         type: Optional[ItemType] = None,
         pattern: Optional[int] = None,
@@ -80,11 +81,11 @@ class Client:
 
         Parameters
         ----------
-        skin: BlueGemItem
+        skin: :class:`~csbluegem.types.BlueGemItem`
             The skin to search for.
-        currency: Currency, optional
+        currency: :class:`~csbluegem.types.Currency`, optional
             The currency to return, by default USD.
-        type: ItemType, optional
+        type: :class:`~csbluegem.types.ItemType`, optional
             The item's type, None for any. By default None.
         pattern: :class:`int`, optional
             The items pattern. None for any pattern. By default None.
@@ -96,11 +97,11 @@ class Client:
             The minimum float of a returned item, by default `0`.
         float_max: :class:`float`, optional
             The maximum float of a returned item, by default `1`.
-        sort_key: SortKey, optional
+        sort_key: :class:`~csbluegem.types.SortKey`, optional
             How should the results be sorted, by default Date.
-        sort: Order, optional
+        sort: :class:`~csbluegem.types.Order`, optional
             How to order the results, by default DESC.
-        origin: Origin, optional
+        origin: :class:`~csbluegem.types.Origin`, optional
             Where the sales originated from, None for any. By default None.
         date_min: Optional[:class:`datetime.datetime`], optional
             The earliest a sale can be from, None for no minimum, by default None.
@@ -173,15 +174,84 @@ class Client:
 
         return [Sale._from_dict(d) for d in data]
 
-    async def pattern_data(self):
-        raise NotImplementedError()
+    async def pattern_data(
+        self,
+        item: BlueGemItem,
+        /,
+        pattern: Optional[int] = None,
+        sort: SortKey = SortKey.Pattern,
+        order: Order = Order.Desc,
+        quantity: bool = False,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        *filters: Filter,
+    ) -> List[PatternData]:
+        """Get pattern data for a skin.
+
+        Parameters
+        ----------
+        item: :class:`~csbluegem.types.BlueGemItem`
+            The skin to get pattern data for.
+        pattern: Optional[:class:`int`], optional
+            The pattern to get data for, None for any. By default None
+        sort: :class:`~csbluegem.types.SortKey`, optional
+            How the results should be sorted, by default pattern.
+        order: :class:`~csbluegem.types.Order`, optional
+            How to order the results, by default descending.
+        quantity: :class:`bool`, optional
+            Whether to return quantities of sales. By default False.
+        offset: Optional[:class:`int`], optional
+            The offset to start returning results from. None for no offset. By default None.
+        limit: Optional[:class:`int`], optional
+            The maximum number of results to return, None for no limit. By default None.
+
+        Returns
+        -------
+        List[:class:`~csbluegem.types.PatternData`]
+            The resulting data about the patterns.
+
+        Raises
+        ------
+        :class:`~csbluegem.errors.BadArgument`
+            You provided an invalid parameter.
+        :class:`~csbluegem.errors.InvalidRequest`
+            One of the parameters given was invalid.
+        :class:`~csbluegem.errors.ServerError`
+            The CSBlueGem server could not process the request.
+        :class:`~csbluegem.errors.NotFound`
+            The search returned no results.
+        """
+        params = {
+            "skin": item.value,
+            "quantity": quantity,
+            "limit": limit,
+            "offset": offset,
+            "pattern": pattern,
+            "sort": sort.value,
+            "order": order.value,
+        }
+
+        if limit is not None:
+            params["limit"] = limit
+
+        if offset is not None:
+            params["offset"] = offset
+
+        for filter in filters:
+            if not filter._is_valid():
+                raise BadArgument(f"a provided filter is invalid: {filter!r}")
+
+        r = Route("GET", "/patterndata")
+        data = await self.http.request(r, params=params)
+
+        return [PatternData._from_data(d) for d in data]
 
     async def pricecheck(self, knife: BlueGemKnife, pattern: int, float: float) -> int:
         """Runs a price check for an item.
 
         Parameters
         ----------
-        knife: BlueGemKnives
+        knife: :class:`~csbluegem.types.BlueGemKnife`
             The knife to price check.
         pattern: :class:`int`
             The pattern of the knife.
