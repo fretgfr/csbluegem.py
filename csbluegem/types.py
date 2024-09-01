@@ -24,45 +24,172 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
-from typing import Any, Dict, Literal
+from typing import Any, Dict, Literal, Optional, TypedDict, Union
 
 from .utils import parse_date, utcnow
 
-__all__ = ("Sale",)
+__all__ = (
+    "Screenshots",
+    "Sale",
+)
+
+
+class _APIPatternDataDict(TypedDict):
+    aq_oiled: str
+    backside_blue: float
+    backside_contour_blue: int
+    backside_contour_purple: int
+    backside_gold: float
+    backside_purple: float
+    csbluegem_screenshot: str
+    playside_blue: float
+    playside_contour_blue: int
+    playside_contour_purple: float
+    playside_gold: float
+    playside_purple: float
+
+
+class _APISaleDataDict(TypedDict):
+    date: str
+    origin: str
+    inspect: str
+    price: float
+
+
+class _APIScreenshotsDict(TypedDict):
+    inspect: Optional[str]
+    inspect_playside: Optional[str]
+    inspect_backside: Optional[str]
+
+
+@dataclass
+class Screenshots:
+    __slots__ = ("sale", "_inspect", "inspect_playside", "inspect_backside")
+
+    sale: Sale
+    _inspect: Optional[str]
+    inspect_playside: Optional[str]
+    inspect_backside: Optional[str]
+
+    @classmethod
+    def _from_data(cls, sale: Sale, /, *, data: _APIScreenshotsDict):
+        inspect = data["inspect"]
+        inspect_playside = data["inspect_playside"]
+        inspect_backside = data["inspect_backside"]
+
+        return cls(sale, inspect, inspect_playside, inspect_backside)
+
+    @property
+    def inspect(self) -> str:
+        """Returns an inspect link no matter where the underlying :class:`~csbluegem.types.Sale` originated.
+
+        For CSFloat based Sales, this will return the playside inspect link.
+        """
+
+        if self._inspect:
+            return self._inspect
+
+        if self.inspect_playside:
+            return self.inspect_playside
+
+        raise RuntimeError("invalid data was received from the API")
+
+
+@dataclass
+class PatternData:
+
+    __slots__ = (
+        "aq_oiled",
+        "backside_blue",
+        "backside_contour_blue",
+        "backside_contour_purple",
+        "backside_gold",
+        "backside_purple",
+        "csbluegem_screenshot",
+        "playside_blue",
+        "playside_contour_blue",
+        "playside_contour_purple",
+        "playside_gold",
+        "playside_purple",
+    )
+
+    aq_oiled: str
+    backside_blue: float
+    backside_contour_blue: int
+    backside_contour_purple: int
+    backside_gold: float
+    backside_purple: float
+    csbluegem_screenshot: str
+    playside_blue: float
+    playside_contour_blue: int
+    playside_contour_purple: float
+    playside_gold: float
+    playside_purple: float
+
+    @classmethod
+    def _from_data(cls, data: _APIPatternDataDict):
+        return cls(**data)
+
+
+@dataclass
+class SaleData:
+    __slots__ = ("timestamp", "origin", "inspect", "price")
+
+    timestamp: datetime.datetime
+    origin: str
+    inspect: str
+    price: float
+
+    @classmethod
+    def _from_data(cls, data: _APISaleDataDict):
+        date = parse_date(data["date"])
+        origin = data["origin"]
+        inspect = data["inspect"]
+        price = data["price"]
+
+        return cls(date, origin, inspect, price)
+
+    @property
+    def date(self) -> datetime.date:
+        return self.timestamp.date()
+
+    @property
+    def days_since(self) -> int:
+        """The number of days since this sale."""
+        return (utcnow() - self.timestamp).days
 
 
 @dataclass
 class Sale:
     __slots__ = ("_float", "is_stattrak", "pattern", "origin", "date", "price")
 
+    buff_id: int
+    csfloat: str
     _float: float
     is_stattrak: bool
     pattern: int
-    origin: str
-    timestamp: datetime.datetime
-    price: float
-    # TODO INCOMPLETE
+    pattern_data: Optional[PatternData]
+    sale_data: Optional[SaleData]
 
     @classmethod
     def _from_dict(cls, data: Dict[str, Any]):
+        buff_id = data["buff_id"]
+        csfloat = data["csfloat"]
         _float = data["float"]
         is_stattrak = data["isStattrak"]
         api_pattern = data["pattern"]
-        origin = data["sale_info"]["origin"]
-        date = parse_date(data["sale_info"]["date"])
-        price = float(data["sale_info"]["price"])
-        # TODO INCOMPLETE
 
-        return cls(_float, is_stattrak, api_pattern, origin, date, price)
+        raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
+        pattern_data = PatternData._from_data(raw_pattern_data) if raw_pattern_data is not None else None
+
+        raw_sale_data: Optional[_APISaleDataDict] = data.get("sale_data")
+        sale_data = SaleData._from_data(raw_sale_data) if raw_sale_data is not None else None
+
+        return cls(buff_id, csfloat, _float, is_stattrak, api_pattern, pattern_data, sale_data)
 
     @property
     def float(self):
         return self._float
-
-    @property
-    def days_since(self) -> int:
-        """The number of days since this sale."""
-        return (utcnow() - self.timestamp).days
 
 
 BlueGemItem = Literal[
