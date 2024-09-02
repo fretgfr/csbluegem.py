@@ -31,7 +31,7 @@ import aiohttp
 from .errors import BlueGemError, InvalidRequest, NotFound, ServerError
 from .meta import __version__
 
-BASE_URL = "https://csbluegem.com/api/v2"
+BASE_URL = "https://api.csbluegem.com/v2"
 HTTP_METHOD = Literal["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "TRACE", "CONNECT", "OPTIONS"]
 
 

@@ -23,9 +23,9 @@ SOFTWARE.
 from __future__ import annotations
 
 import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, NotRequired, Optional, TypedDict
+from typing import Dict, List, NotRequired, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
@@ -53,18 +53,19 @@ class _APISearchMetaDict(TypedDict):
 
 
 class _APIPatternDataDict(TypedDict):
-    aq_oiled: str
     backside_blue: float
     backside_contour_blue: int
     backside_contour_purple: int
     backside_gold: float
     backside_purple: float
-    csbluegem_screenshot: str
     playside_blue: float
     playside_contour_blue: int
     playside_contour_purple: float
     playside_gold: float
     playside_purple: float
+    pattern: NotRequired[int]
+    screenshots: NotRequired[Dict[str, str]]  # TODO Proper typing for this
+    extra: NotRequired[Dict[str, str]]  # TODO Proper typing for this
 
 
 class _APIScreenshotsDict(TypedDict):
@@ -145,8 +146,6 @@ class PatternData:
 
     Attributes
     ----------
-    aq_oiled: :class:`str`
-        A URL to a screenshot with the skin over the aq oiled template.
     backside_blue: :class:`float`
         The percentage of blue visible on the back side.
     backside_contour_blue: :class:`int`
@@ -157,8 +156,6 @@ class PatternData:
         The percentage of gold visible on the back side.
     backside_purple: :class:`float`
         The percentage of purple visible on the back side.
-    csbluegem_screenshot: :class:`str`
-        A URL to a sample screenshot of the pattern.
     playside_blue: :class:`float`
         The percentage of blue visible on the back side.
     playside_contour_blue: :class:`int`
@@ -172,36 +169,66 @@ class PatternData:
     """
 
     __slots__ = (
-        "aq_oiled",
         "backside_blue",
         "backside_contour_blue",
         "backside_contour_purple",
         "backside_gold",
         "backside_purple",
-        "csbluegem_screenshot",
         "playside_blue",
         "playside_contour_blue",
         "playside_contour_purple",
         "playside_gold",
         "playside_purple",
+        "pattern",
+        "screenshots",
+        "extra",
     )
 
-    aq_oiled: str
     backside_blue: float
     backside_contour_blue: int
     backside_contour_purple: int
     backside_gold: float
     backside_purple: float
-    csbluegem_screenshot: str
     playside_blue: float
     playside_contour_blue: int
     playside_contour_purple: float
     playside_gold: float
     playside_purple: float
+    pattern: Optional[int]
+    screenshots: Optional[Dict[str, str]]
+    extra: Optional[Dict[str, str]]
 
     @classmethod
     def _from_data(cls, data: _APIPatternDataDict, /):
-        return cls(**data)
+        backside_blue = data["backside_blue"]
+        backside_contour_blue = data["backside_contour_blue"]
+        backside_contour_purple = data["backside_contour_purple"]
+        backside_gold = data["backside_gold"]
+        backside_purple = data["backside_purple"]
+        playside_blue = data["playside_blue"]
+        playside_contour_blue = data["playside_contour_blue"]
+        playside_contour_purple = data["playside_contour_purple"]
+        playside_gold = data["playside_gold"]
+        playside_purple = data["playside_purple"]
+        pattern = data.get("pattern")
+        screenshots = data.get("screenshots")
+        extra = data.get("extra")
+
+        return cls(
+            backside_blue,
+            backside_contour_blue,
+            backside_contour_purple,
+            backside_gold,
+            backside_purple,
+            playside_blue,
+            playside_contour_blue,
+            playside_contour_purple,
+            playside_gold,
+            playside_purple,
+            pattern,
+            screenshots,
+            extra,
+        )
 
 
 @dataclass
@@ -216,7 +243,7 @@ class SearchMeta:
         The total number of items available.
     """
 
-    __slots__ = ("count", "max_sale", "min_sale", "size")
+    __slots__ = ("size", "total")
 
     size: int
     total: int

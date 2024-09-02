@@ -24,13 +24,26 @@ from __future__ import annotations
 
 import datetime
 from types import TracebackType
-from typing import TYPE_CHECKING, List, Optional, Type
+from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 import aiohttp
 
 from .errors import BadArgument
 from .http import HTTPClient, Route
-from .types import BlueGemItem, BlueGemKnife, Currency, Filter, ItemType, Order, Origin, PatternData, Sale, SortKey
+from .types import (
+    BlueGemItem,
+    BlueGemKnife,
+    Currency,
+    Filter,
+    ItemType,
+    Order,
+    Origin,
+    PatternData,
+    Sale,
+    SearchMeta,
+    SearchResponse,
+    SortKey,
+)
 from .utils import _is_valid_float, _is_valid_pricecheck_pattern, _is_valid_search_pattern
 
 if TYPE_CHECKING:
@@ -64,10 +77,10 @@ class Client:
         currency: Currency = Currency.USD,
         type: Optional[ItemType] = None,
         pattern: Optional[int] = None,
-        price_min: float = 0,
-        price_max: float = 9999999999.99,
-        float_min: float = 0,
-        float_max: float = 1,
+        price_min: Optional[float] = None,
+        price_max: Optional[float] = None,
+        float_min: Optional[float] = None,
+        float_max: Optional[float] = None,
         sort: SortKey = SortKey.Date,
         order: Order = Order.Desc,
         origin: Optional[Origin] = None,
@@ -75,8 +88,9 @@ class Client:
         date_max: Optional[datetime.datetime] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        pattern_data: bool = False,
         *filters: Filter,
-    ) -> List[Sale]:
+    ) -> SearchResponse:
         """Searches for an item on CSBlueGem.
 
         Parameters
@@ -111,6 +125,8 @@ class Client:
             The maximum number of results to return. None for no limit. By default None.
         offset: Optional[:class:`int`], optional
             The offset to start returning results from. None for no offset. By default None.
+        pattern_data: :class:`bool`, optional
+            Whether to include pattern data in the returned results, by default False
         filters: :class:`~csbluegem.types.Filter`
             Filters to apply to the search.
 
@@ -130,25 +146,45 @@ class Client:
         :class:`~csbluegem.errors.NotFound`
             The search returned no results.
         """
-        if not (_is_valid_float(float_min) and _is_valid_float(float_max)):
-            raise BadArgument("float is not in range.")
-
-        if not _is_valid_search_pattern(pattern):
-            raise BadArgument("pattern is invalid")
-
-        params = {
+        params: Dict[str, str | float | int] = {
             "skin": skin.value,
             "currency": currency.value,
-            "type": type.value if type else None,
-            "pattern": pattern,
-            "price_min": price_min,
-            "price_max": price_max,
-            "float_min": float_min,
-            "float_max": float_max,
             "sort": sort.value,
             "order": order.value,
-            "origin": origin.value if origin else None,
         }
+
+        if pattern_data is True:
+            params["pattern_data"] = "true"
+
+        if price_min is not None:
+            params["price_min"] = price_min
+
+        if price_max is not None:
+            params["price_max"] = price_max
+
+        if origin is not None:
+            params["origin"] = origin.value
+
+        if type is not None:
+            params["type"] = type.value
+
+        if pattern is not None:
+            if not _is_valid_search_pattern(pattern):
+                raise BadArgument("pattern is invalid.")
+
+            params["pattern"] = pattern
+
+        if float_min is not None:
+            if not _is_valid_float(float_min):
+                raise BadArgument("float_min is not in range.")
+
+            params["float_min"] = float_min
+
+        if float_max is not None:
+            if not _is_valid_float(float_max):
+                raise BadArgument("float_max is not in range.")
+
+            params["float_max"] = float_max
 
         if date_min is not None:
             params["date_min"] = date_min.timestamp()
@@ -172,7 +208,7 @@ class Client:
         r = Route("GET", "/search")
         data = await self.http.request(r, params=params)
 
-        return [Sale._from_dict(d) for d in data]
+        return SearchResponse(SearchMeta._from_data(data["meta"]), [Sale._from_dict(d) for d in data["sales"]])
 
     async def pattern_data(
         self,
@@ -221,15 +257,17 @@ class Client:
         :class:`~csbluegem.errors.NotFound`
             The search returned no results.
         """
-        params = {
+        params: Dict[str, int | float | str] = {
             "skin": item.value,
-            "quantity": quantity,
-            "limit": limit,
-            "offset": offset,
-            "pattern": pattern,
             "sort": sort.value,
             "order": order.value,
         }
+
+        if quantity is True:
+            params["quantity"] = "true"
+
+        if pattern is not None:
+            params["pattern"] = pattern
 
         if limit is not None:
             params["limit"] = limit
@@ -244,7 +282,8 @@ class Client:
         r = Route("GET", "/patterndata")
         data = await self.http.request(r, params=params)
 
-        return [PatternData._from_data(d) for d in data]
+        # This has a `meta` attribute that could be retuend as well.
+        return [PatternData._from_data(d) for d in data["data"]]
 
     async def pricecheck(self, knife: BlueGemKnife, pattern: int, float: float) -> int:
         """Runs a price check for an item.

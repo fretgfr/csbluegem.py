@@ -5,7 +5,7 @@ import csbluegem
 
 async def main():
     async with csbluegem.Client() as client:
-        result = await client.pricecheck(csbluegem.BlueGemKnife.ClassicKnife, pattern=222, float=0.2430)
+        result = await client.pricecheck(csbluegem.BlueGemKnife.ClassicKnife, pattern=22, float=0.24301231231)
 
         print(result)
 
