@@ -261,6 +261,7 @@ class Sale:
         "_float",
         "type",
         "pattern",
+        "price",
         "timestamp",
         "origin",
         "pattern_data",
@@ -272,6 +273,7 @@ class Sale:
     _float: float
     type: str
     pattern: int
+    price: float
     timestamp: datetime.datetime
     origin: Origin
     pattern_data: Optional[PatternData]
@@ -284,6 +286,7 @@ class Sale:
         _float = data["float"]
         type = data["type"]
         api_pattern = data["pattern"]
+        price = data["price"]
         timestamp = parse_epoch(data["epoch"])
         origin = Origin(data["origin"])
 
@@ -293,7 +296,7 @@ class Sale:
         raw_screenshots_data: _APIScreenshotsDict = data["screenshots"]
         screenshots = Screenshots._from_data(raw_screenshots_data)
 
-        return cls(buff_id, csfloat, _float, type, api_pattern, timestamp, origin, pattern_data, screenshots)
+        return cls(buff_id, csfloat, _float, type, api_pattern, price, timestamp, origin, pattern_data, screenshots)
 
     @property
     def float(self):
@@ -316,7 +319,7 @@ class Sale:
         return (utcnow() - self.timestamp).days
 
     @property
-    def is_stattrack(self) -> bool:
+    def is_stattrak(self) -> bool:
         """Whether the item was stattrak"""
         return self.type == "stattrak"
 
