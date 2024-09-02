@@ -422,7 +422,7 @@ class Order(Enum):
 
 
 class ItemType(Enum):
-    StatTrak = "stattrack"
+    StatTrak = "stattrak"
     Normal = "normal"
 
 
@@ -442,7 +442,7 @@ class SortKey(Enum):
     PlaysideGold = "playside_gold"
     BacksideBlue = "backside_blue"
     BacksidePurple = "backside_purple"
-    BacksideGold = "backside_Gold"
+    BacksideGold = "backside_gold"
     PlaysideContourBlue = "playside_contour_blue"
     PlaysideContourPurple = "playside_contour_purple"
     BacksideContourBlue = "backside_contour_blue"
