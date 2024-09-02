@@ -6,7 +6,7 @@ import csbluegem
 
 async def main():
     async with csbluegem.Client() as client:
-        results = await client.search("Bayonet")
+        results = await client.search(csbluegem.BlueGemItem.M9Bayonet)
 
         for result in results:
             s = f"""
