@@ -331,7 +331,7 @@ csbluegem.utils module
 csbluegem.errors module
 ---------------------
 
-.. currentmodule:: zipline.errors
+.. currentmodule:: csbluegem.errors
 
 .. autoclass:: csbluegem.errors.BlueGemError
     :members:
