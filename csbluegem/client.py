@@ -39,6 +39,7 @@ from .types import (
     Order,
     Origin,
     PatternData,
+    PatternDataResponse,
     Sale,
     SearchMeta,
     SearchResponse,
@@ -221,7 +222,7 @@ class Client:
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         *filters: Filter,
-    ) -> List[PatternData]:
+    ) -> PatternDataResponse:
         """Get pattern data for a skin.
 
         Parameters
@@ -282,8 +283,7 @@ class Client:
         r = Route("GET", "/patterndata")
         data = await self.http.request(r, params=params)
 
-        # This has a `meta` attribute that could be retuend as well.
-        return [PatternData._from_data(d) for d in data["data"]]
+        return PatternDataResponse._from_data(data)
 
     async def pricecheck(self, knife: BlueGemKnife, pattern: int, float: float) -> int:
         """Runs a price check for an item.
