@@ -32,7 +32,7 @@ from .utils import parse_epoch, utcnow
 __all__ = (
     "Screenshots",
     "PatternDataScreenshots",
-    "PatternDataExtras",
+    "PatternDataExtra",
     "PatternData",
     "SearchMeta",
     "Sale",
