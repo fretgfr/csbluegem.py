@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import datetime
 from types import TracebackType
-from typing import TYPE_CHECKING, Dict, List, Optional, Type
+from typing import TYPE_CHECKING, Dict, List, Optional, Type, Union
 
 import aiohttp
 
@@ -44,7 +44,7 @@ from .types import (
     SearchResponse,
     SortKey,
 )
-from .utils import _is_valid_float, _is_valid_pricecheck_pattern, _is_valid_search_pattern
+from .utils import _is_valid_float, _is_valid_pattern
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -99,23 +99,23 @@ class Client:
             The skin to search for.
         currency: :class:`~csbluegem.types.Currency`, optional
             The currency to return, by default USD.
-        type: :class:`~csbluegem.types.ItemType`, optional
+        type: Optional[:class:`~csbluegem.types.ItemType`], optional
             The item's type, None for any. By default None.
-        pattern: :class:`int`, optional
+        pattern: Optional[:class:`int`], optional
             The items pattern. None for any pattern. By default None.
-        price_min: :class:`float`, optional
-            The minimum price of the sale, by default `0`.
-        price_max: :class:`float`, optional
-            The maximum price of the sale, by default `9999999999.99`.
-        float_min: :class:`float`, optional
-            The minimum float of a returned item, by default `0`.
-        float_max: :class:`float`, optional
-            The maximum float of a returned item, by default `1`.
-        sort_key: :class:`~csbluegem.types.SortKey`, optional
+        price_min: Optional[:class:`float`], optional
+            The minimum price of the sale.
+        price_max: Optional[:class:`float`], optional
+            The maximum price of the sale.
+        float_min: Optional[:class:`float`], optional
+            The minimum float of a returned item.
+        float_max: Optional[:class:`float`], optional
+            The maximum float of a returned item.
+        sort: :class:`~csbluegem.types.SortKey`, optional
             How should the results be sorted, by default Date.
-        sort: :class:`~csbluegem.types.Order`, optional
+        order: :class:`~csbluegem.types.Order`, optional
             How to order the results, by default DESC.
-        origin: :class:`~csbluegem.types.Origin`, optional
+        origin: Optional[:class:`~csbluegem.types.Origin`], optional
             Where the sales originated from, None for any. By default None.
         date_min: Optional[:class:`datetime.datetime`], optional
             The earliest a sale can be from, None for no minimum, by default None.
@@ -146,7 +146,7 @@ class Client:
         :class:`~csbluegem.errors.NotFound`
             The search returned no results.
         """
-        params: Dict[str, str | float | int] = {
+        params: Dict[str, Union[str, float, int]] = {
             "skin": skin.value,
             "currency": currency.value,
             "sort": sort.value,
@@ -169,7 +169,7 @@ class Client:
             params["type"] = type.value
 
         if pattern is not None:
-            if not _is_valid_search_pattern(pattern):
+            if not _is_valid_pattern(pattern):
                 raise BadArgument("pattern is invalid.")
 
             params["pattern"] = pattern
@@ -208,7 +208,7 @@ class Client:
         r = Route("GET", "/search")
         data = await self.http.request(r, params=params)
 
-        return SearchResponse(SearchMeta._from_data(data["meta"]), [Sale._from_dict(d) for d in data["sales"]])
+        return SearchResponse(SearchMeta._from_data(data["meta"]), [Sale._from_data(d) for d in data["sales"]])
 
     async def pattern_data(
         self,
@@ -257,7 +257,7 @@ class Client:
         :class:`~csbluegem.errors.NotFound`
             The search returned no results.
         """
-        params: Dict[str, int | float | str] = {
+        params: Dict[str, Union[int, float, str]] = {
             "skin": item.value,
             "sort": sort.value,
             "order": order.value,
@@ -313,7 +313,7 @@ class Client:
         :class:`~csbluegem.errors.NotFound`
             The search returned no results.
         """
-        if not _is_valid_pricecheck_pattern(pattern):
+        if not _is_valid_pattern(pattern):
             raise BadArgument("price check pattern must be 0 <= N <= 1000")
 
         if not _is_valid_float(float):

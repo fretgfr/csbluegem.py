@@ -31,6 +31,8 @@ from .utils import parse_epoch, utcnow
 
 __all__ = (
     "Screenshots",
+    "PatternDataScreenshots",
+    "PatternDataExtras",
     "PatternData",
     "SearchMeta",
     "Sale",
@@ -64,11 +66,11 @@ class _APIPatternDataDict(TypedDict):
     playside_gold: float
     playside_purple: float
     pattern: NotRequired[int]
-    screenshots: NotRequired[Dict[str, str]]  # TODO Proper typing for this
-    extra: NotRequired[Dict[str, str]]  # TODO Proper typing for this
+    screenshots: NotRequired[_APIPatternDataScreenshots]
+    extra: NotRequired[_APIPatternDataExtras]
 
 
-class _APIScreenshotsDict(TypedDict):
+class _APISearchScreenshotsDict(TypedDict):
     inspect: Optional[str]
     inspect_playside: Optional[str]
     inspect_backside: Optional[str]
@@ -84,14 +86,31 @@ class _APISearchSaleDict(TypedDict):
     price: float
     epoch: int
     type: str
-    screenshots: _APIScreenshotsDict
+    screenshots: _APISearchScreenshotsDict
     pattern_data: NotRequired[_APIPatternDataDict]
     csfloat: str
+
+
+class _APIPatternDataScreenshots(TypedDict):
+    csbluegem_screenshot: str
+    aq_oiled: str
+
+
+class _APIPatternDataExtras(TypedDict):
+    similar_playside: str
+    similar_backside: str
+    csfloat_link: str
+    search: str
 
 
 class _APISearchResponseDict(TypedDict):
     meta: _APISearchMetaDict
     sales: List[_APISearchSaleDict]
+
+
+class _APIPatternDataResponseDict(TypedDict):
+    meta: _APISearchMetaDict
+    data: List[_APIPatternDataDict]
 
 
 @dataclass
@@ -117,7 +136,7 @@ class Screenshots:
     inspect_backside: Optional[str]
 
     @classmethod
-    def _from_data(cls, data: _APIScreenshotsDict, /):
+    def _from_data(cls, data: _APISearchScreenshotsDict, /):
         inspect = data["inspect"]
         inspect_playside = data["inspect_playside"]
         inspect_backside = data["inspect_backside"]
@@ -138,6 +157,58 @@ class Screenshots:
             return self.inspect_playside
 
         raise RuntimeError("invalid data was received from the API")
+
+
+@dataclass
+class PatternDataScreenshots:
+    """Screenshots that may be associated with this :class:`~csbluegem.types.PatternData`.
+
+    Only available when using :meth:`~csbluegem.client.Client.pattern_data`.
+
+    Attributes
+    ----------
+    backside_blue: :class:`float`
+        The percentage of blue visible on the back side.
+    """
+
+    __slots__ = ("csbluegem_screenshot", "aq_oiled")
+
+    csbluegem_screenshot: str
+    aq_oiled: str
+
+    @classmethod
+    def _from_data(cls, data: _APIPatternDataScreenshots, /):
+        return cls(**data)
+
+
+@dataclass
+class PatternDataExtra:
+    """Extra information provided for pattern data.
+
+    Only available when using :meth:`~csbluegem.client.Client.pattern_data`.
+
+    Attributes
+    ----------
+    similar_playside: :class:`str`
+        A URL to an image of an item with a similar playside.
+    similar_backside: :class:`str`
+        A URL to an image of an item with a similar backside.
+    csfloat_link: :class:`str`
+        The CSFloat database query for this pattern.
+    search: :class:`str`
+        A URL to a search for this pattern.
+    """
+
+    __slots__ = ("similar_playside", "similar_backside", "csfloat_link", "search")
+
+    similar_playside: str
+    similar_backside: str
+    csfloat_link: str
+    search: str
+
+    @classmethod
+    def _from_data(cls, data: _APIPatternDataExtras, /):
+        return cls(**data)
 
 
 @dataclass
@@ -195,8 +266,8 @@ class PatternData:
     playside_gold: float
     playside_purple: float
     pattern: Optional[int]
-    screenshots: Optional[Dict[str, str]]
-    extra: Optional[Dict[str, str]]
+    screenshots: Optional[PatternDataScreenshots]
+    extra: Optional[PatternDataExtra]
 
     @classmethod
     def _from_data(cls, data: _APIPatternDataDict, /):
@@ -211,8 +282,11 @@ class PatternData:
         playside_gold = data["playside_gold"]
         playside_purple = data["playside_purple"]
         pattern = data.get("pattern")
-        screenshots = data.get("screenshots")
-        extra = data.get("extra")
+        screenshots_dict = data.get("screenshots")
+        extra_dict = data.get("extra")
+
+        screenshots = PatternDataScreenshots._from_data(screenshots_dict) if screenshots_dict is not None else None
+        extra = PatternDataExtra._from_data(extra_dict) if extra_dict is not None else None
 
         return cls(
             backside_blue,
@@ -307,7 +381,7 @@ class Sale:
     screenshots: Screenshots
 
     @classmethod
-    def _from_dict(cls, data: _APISearchSaleDict):
+    def _from_data(cls, data: _APISearchSaleDict):
         buff_id = data["buff_id"]
         csfloat = data["csfloat"]
         _float = data["float"]
@@ -320,7 +394,7 @@ class Sale:
         raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
         pattern_data = PatternData._from_data(raw_pattern_data) if raw_pattern_data is not None else None
 
-        raw_screenshots_data: _APIScreenshotsDict = data["screenshots"]
+        raw_screenshots_data: _APISearchScreenshotsDict = data["screenshots"]
         screenshots = Screenshots._from_data(raw_screenshots_data)
 
         return cls(buff_id, csfloat, _float, type, api_pattern, price, timestamp, origin, pattern_data, screenshots)
@@ -371,9 +445,34 @@ class SearchResponse:
     @classmethod
     def _from_data(cls, data: _APISearchResponseDict):
         meta = SearchMeta._from_data(data["meta"])
-        sales = [Sale._from_dict(d) for d in data["sales"]]
+        sales = [Sale._from_data(d) for d in data["sales"]]
 
         return cls(meta, sales)
+
+
+@dataclass
+class PatternDataResponse:
+    """Represents a response to a pattern data query.
+
+    Attributes
+    ----------
+    meta: :class:`~csbluegem.types.SearchMeta`
+        Metadata about the query.
+    data: List[:class:`~csbluegem.types.PatternData`]
+        The pattern datas that were returned.
+    """
+
+    __slots__ = ("meta", "pattern_data")
+
+    meta: SearchMeta
+    pattern_data: List[PatternData]
+
+    @classmethod
+    def _from_data(cls, api_data: _APIPatternDataResponseDict):
+        meta = SearchMeta._from_data(api_data["meta"])
+        pattern_data = [PatternData._from_data(d) for d in api_data["data"]]
+
+        return cls(meta, pattern_data)
 
 
 class Origin(Enum):

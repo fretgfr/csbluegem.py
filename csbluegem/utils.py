@@ -117,12 +117,8 @@ def safe_get(dict_: Dict[Any, Any], *keys: Any) -> Optional[Any]:
     return dict_
 
 
-def _is_valid_search_pattern(pattern: Optional[int]) -> bool:
+def _is_valid_pattern(pattern: Optional[int]) -> bool:
     return 0 <= pattern <= 1000 if pattern is not None else True
-
-
-def _is_valid_pricecheck_pattern(pattern: int) -> bool:
-    return 0 <= pattern <= 1000
 
 
 def _is_valid_float(flt: float) -> bool:

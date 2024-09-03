@@ -19,6 +19,14 @@ csbluegem.types module
    :members:
    :show-inheritance:
 
+.. autoclass:: csbluegem.types.PatternDataScreenshots
+   :members:
+   :show-inheritance:
+
+.. autoclass:: csbluegem.types.PatternDataExtra
+   :members:
+   :show-inheritance:
+
 .. autoclass:: csbluegem.types.PatternData
    :members:
    :show-inheritance:
@@ -32,6 +40,10 @@ csbluegem.types module
    :show-inheritance:
 
 .. autoclass:: csbluegem.types.SearchResponse
+   :members:
+   :show-inheritance:
+
+.. autoclass:: csbluegem.types.PatternDataResponse
    :members:
    :show-inheritance:
 

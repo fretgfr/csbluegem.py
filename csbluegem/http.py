@@ -28,7 +28,7 @@ from typing import Any, Dict, Literal, Optional, Union
 
 import aiohttp
 
-from .errors import BlueGemError, InvalidRequest, NotFound, ServerError
+from .errors import BlueGemError, HTTPException, InvalidRequest, NotFound, ServerError
 from .meta import __version__
 
 BASE_URL = "https://api.csbluegem.com/v2"
@@ -117,14 +117,16 @@ class HTTPClient:
 
             if isinstance(data, dict):
                 if (message := data.get("message")) is not None:
-                    raise InvalidRequest(message)
+                    raise InvalidRequest(status, message)
+            else:
+                message = ""
 
             if status >= 500:
-                raise ServerError()  # FIXME: pass status code
+                raise ServerError(status, message or "")
             elif status == 404:
-                raise NotFound()  # FIXME: helpful message
+                raise NotFound(status, message or "")
 
             if 200 <= status < 300:
                 return data
 
-            raise BlueGemError()  # FIXME: pass status code
+            raise HTTPException(status, f"an unexpected error occurred: {message}")
