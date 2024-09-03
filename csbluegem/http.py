@@ -28,7 +28,7 @@ from typing import Any, Dict, Literal, Optional, Union
 
 import aiohttp
 
-from .errors import BlueGemError, HTTPException, InvalidRequest, NotFound, ServerError
+from .errors import HTTPException, InvalidRequest, NotFound, ServerError
 from .meta import __version__
 
 BASE_URL = "https://api.csbluegem.com/v2"
