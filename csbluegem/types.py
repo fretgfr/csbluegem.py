@@ -478,19 +478,23 @@ class PatternDataResponse:
 class Origin(Enum):
     """Where a :class:`~csbluegem.types.Sale` originated from."""
 
-    Buff = "Buff"
-    CSFloat = "CSFloat"
-    SkinBid = "SkinBid"
+    # fmt: off
+    Buff     = "Buff"
+    CSFloat  = "CSFloat"
+    SkinBid  = "SkinBid"
     BroSkins = "BroSkins"
+    # fmt: on
 
 
 class FilterType(Enum):
-    PlaysideBlue = "playside_blue"
+    # fmt: off
+    PlaysideBlue   = "playside_blue"
     PlaysidePurple = "playside_purple"
-    PlaysideGold = "playside_gold"
-    BacksideBlue = "backside_blue"
+    PlaysideGold   = "playside_gold"
+    BacksideBlue   = "backside_blue"
     BacksidePurple = "backside_purple"
-    BacksideGold = "backside_gold"
+    BacksideGold   = "backside_gold"
+    # fmt: on
 
 
 class Filter:
@@ -516,13 +520,17 @@ class Filter:
 
 
 class Order(Enum):
-    Asc = "ASC"
+    # fmt: off
+    Asc  = "ASC"
     Desc = "DESC"
+    # fmt: on
 
 
 class ItemType(Enum):
+    # fmt: off
     StatTrak = "stattrak"
-    Normal = "normal"
+    Normal   = "normal"
+    # fmt: on
 
 
 class Currency(Enum):
@@ -536,67 +544,73 @@ class Currency(Enum):
 
 
 class SortKey(Enum):
-    PlaysideBlue = "playside_blue"
-    PlaysidePurple = "playside_purple"
-    PlaysideGold = "playside_gold"
-    BacksideBlue = "backside_blue"
-    BacksidePurple = "backside_purple"
-    BacksideGold = "backside_gold"
-    PlaysideContourBlue = "playside_contour_blue"
+    # fmt: off
+    PlaysideBlue          = "playside_blue"
+    PlaysidePurple        = "playside_purple"
+    PlaysideGold          = "playside_gold"
+    BacksideBlue          = "backside_blue"
+    BacksidePurple        = "backside_purple"
+    BacksideGold          = "backside_gold"
+    PlaysideContourBlue   = "playside_contour_blue"
     PlaysideContourPurple = "playside_contour_purple"
-    BacksideContourBlue = "backside_contour_blue"
+    BacksideContourBlue   = "backside_contour_blue"
     BacksideContourPurple = "backside_contour_purple"
-    Pattern = "pattern"
-    Float = "float"
-    Date = "date"
-    Price = "price"
+    Pattern               = "pattern"
+    Float                 = "float"
+    Date                  = "date"
+    Price                 = "price"
+    # fmt: on
 
 
 class BlueGemItem(Enum):
-    AK47 = "AK-47"
-    Bayonet = "Bayonet"
-    BowieKnife = "Bowie Knife"
+    # fmt: off
+    AK47           = "AK-47"
+    Bayonet        = "Bayonet"
+    BowieKnife     = "Bowie Knife"
     ButterflyKnife = "Butterfly Knife"
-    ClassicKnife = "Classic Knife"
-    FalchionKnife = "Falchion Knife"
-    FiveSeveN = "Five-SeveN"
-    FlipKnife = "Flip Knife"
-    GutKnife = "Gut Knife"
-    HuntsmanKnife = "Huntsman Knife"
-    HydraGloves = "Hydra Gloves"
-    Karambit = "Karambit"
-    KukriKnife = "Kukri Knife"
-    M9Bayonet = "M9 Bayonet"
-    MAC10 = "MAC-10"
-    NavajaKnife = "Navaja Knife"
-    NomadKnife = "Nomad Knife"
-    ParacordKnife = "Paracord Knife"
-    ShadowDaggers = "Shadow Daggers"
-    SkeletonKnife = "Skeleton Knife"
-    StilettoKnife = "Stiletto Knife"
-    SurvivalKnife = "Survival Knife"
-    TalonKnife = "Talon Knife"
-    UrsusKnife = "Ursus Knife"
+    ClassicKnife   = "Classic Knife"
+    FalchionKnife  = "Falchion Knife"
+    FiveSeveN      = "Five-SeveN"
+    FlipKnife      = "Flip Knife"
+    GutKnife       = "Gut Knife"
+    HuntsmanKnife  = "Huntsman Knife"
+    HydraGloves    = "Hydra Gloves"
+    Karambit       = "Karambit"
+    KukriKnife     = "Kukri Knife"
+    M9Bayonet      = "M9 Bayonet"
+    MAC10          = "MAC-10"
+    NavajaKnife    = "Navaja Knife"
+    NomadKnife     = "Nomad Knife"
+    ParacordKnife  = "Paracord Knife"
+    ShadowDaggers  = "Shadow Daggers"
+    SkeletonKnife  = "Skeleton Knife"
+    StilettoKnife  = "Stiletto Knife"
+    SurvivalKnife  = "Survival Knife"
+    TalonKnife     = "Talon Knife"
+    UrsusKnife     = "Ursus Knife"
+    # fmt: on
 
 
 class BlueGemKnife(Enum):
-    Bayonet = "Bayonet"
-    BowieKnife = "Bowie Knife"
+    # fmt: off
+    Bayonet        = "Bayonet"
+    BowieKnife     = "Bowie Knife"
     ButterflyKnife = "Butterfly Knife"
-    ClassicKnife = "Classic Knife"
-    FalchionKnife = "Falchion Knife"
-    FlipKnife = "Flip Knife"
-    GutKnife = "Gut Knife"
-    HuntsmanKnife = "Huntsman Knife"
-    Karambit = "Karambit"
-    KukriKnife = "Kukri Knife"
-    M9Bayonet = "M9 Bayonet"
-    NavajaKnife = "Navaja Knife"
-    NomadKnife = "Nomad Knife"
-    ParacordKnife = "Paracord Knife"
-    ShadowDaggers = "Shadow Daggers"
-    SkeletonKnife = "Skeleton Knife"
-    StilettoKnife = "Stiletto Knife"
-    SurvivalKnife = "Survival Knife"
-    TalonKnife = "Talon Knife"
-    UrsusKnife = "Ursus Knife"
+    ClassicKnife   = "Classic Knife"
+    FalchionKnife  = "Falchion Knife"
+    FlipKnife      = "Flip Knife"
+    GutKnife       = "Gut Knife"
+    HuntsmanKnife  = "Huntsman Knife"
+    Karambit       = "Karambit"
+    KukriKnife     = "Kukri Knife"
+    M9Bayonet      = "M9 Bayonet"
+    NavajaKnife    = "Navaja Knife"
+    NomadKnife     = "Nomad Knife"
+    ParacordKnife  = "Paracord Knife"
+    ShadowDaggers  = "Shadow Daggers"
+    SkeletonKnife  = "Skeleton Knife"
+    StilettoKnife  = "Stiletto Knife"
+    SurvivalKnife  = "Survival Knife"
+    TalonKnife     = "Talon Knife"
+    UrsusKnife     = "Ursus Knife"
+    # fmt: on
