@@ -23,9 +23,9 @@ SOFTWARE.
 from __future__ import annotations
 
 import datetime
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, NotRequired, Optional, TypedDict
+from typing import List, NotRequired, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
