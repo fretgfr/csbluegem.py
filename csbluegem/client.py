@@ -222,7 +222,7 @@ class Client:
         quantity: bool = False,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
-        *filters: Filter,
+        filters: Optional[Sequence[Filter]] = None,
     ) -> PatternDataResponse:
         """Get pattern data for a skin.
 
@@ -277,9 +277,13 @@ class Client:
         if offset is not None:
             params["offset"] = offset
 
-        for filter in filters:
-            if not filter._is_valid():
-                raise BadArgument(f"a provided filter is invalid: {filter!r}")
+        if filters is not None:
+            for filter in filters:
+                if not filter._is_valid():
+                    raise BadArgument(f"a provided filter is invalid: {filter!r}")
+
+                params[f"{filter.type.value}_min"] = filter.min
+                params[f"{filter.type}_max"] = filter.max
 
         r = Route("GET", "/patterndata")
         data = await self.http.request(r, params=params)
