@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import datetime
 from types import TracebackType
-from typing import TYPE_CHECKING, Dict, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Type, Union
 
 import aiohttp
 
@@ -90,7 +90,7 @@ class Client:
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         pattern_data: bool = False,
-        *filters: Filter,
+        filters: Optional[Sequence[Filter]] = None,
     ) -> SearchResponse:
         """Searches for an item on CSBlueGem.
 
@@ -188,10 +188,10 @@ class Client:
             params["float_max"] = float_max
 
         if date_min is not None:
-            params["date_min"] = date_min.timestamp()
+            params["date_min"] = int(date_min.timestamp())
 
         if date_max is not None:
-            params["date_max"] = date_max.timestamp()
+            params["date_max"] = int(date_max.timestamp())
 
         if limit is not None:
             params["limit"] = limit
@@ -199,12 +199,13 @@ class Client:
         if offset is not None:
             params["offset"] = offset
 
-        for filter in filters:
-            if not filter._is_valid():
-                raise BadArgument(f"a provided filter is invalid: {filter!r}")
+        if filters:
+            for filter in filters:
+                if not filter._is_valid():
+                    raise BadArgument(f"a provided filter is invalid: {filter!r}")
 
-            params[f"{filter.type.value}_min"] = filter.min
-            params[f"{filter.type}_max"] = filter.max
+                params[f"{filter.type.value}_min"] = filter.min
+                params[f"{filter.type}_max"] = filter.max
 
         r = Route("GET", "/search")
         data = await self.http.request(r, params=params)
