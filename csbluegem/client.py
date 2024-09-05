@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import datetime
 from types import TracebackType
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, Dict, Optional, Sequence, Type, Union
 
 import aiohttp
 
@@ -38,7 +38,6 @@ from .types import (
     ItemType,
     Order,
     Origin,
-    PatternData,
     PatternDataResponse,
     Sale,
     SearchMeta,
@@ -154,18 +153,6 @@ class Client:
             "order": order.value,
         }
 
-        if pattern_data is True:
-            params["pattern_data"] = "true"
-
-        if price_min is not None:
-            params["price_min"] = price_min
-
-        if price_max is not None:
-            params["price_max"] = price_max
-
-        if origin is not None:
-            params["origin"] = origin.value
-
         if type is not None:
             params["type"] = type.value
 
@@ -174,6 +161,12 @@ class Client:
                 raise BadArgument("pattern is invalid.")
 
             params["pattern"] = pattern
+
+        if price_min is not None:
+            params["price_min"] = price_min
+
+        if price_max is not None:
+            params["price_max"] = price_max
 
         if float_min is not None:
             if not _is_valid_float(float_min):
@@ -187,6 +180,9 @@ class Client:
 
             params["float_max"] = float_max
 
+        if origin is not None:
+            params["origin"] = origin.value
+
         if date_min is not None:
             params["date_min"] = int(date_min.timestamp())
 
@@ -198,6 +194,9 @@ class Client:
 
         if offset is not None:
             params["offset"] = offset
+
+        if pattern_data is True:
+            params["pattern_data"] = "true"
 
         if filters:
             for filter in filters:
@@ -265,17 +264,17 @@ class Client:
             "order": order.value,
         }
 
-        if quantity is True:
-            params["quantity"] = "true"
-
         if pattern is not None:
             params["pattern"] = pattern
 
-        if limit is not None:
-            params["limit"] = limit
+        if quantity is True:
+            params["quantity"] = "true"
 
         if offset is not None:
             params["offset"] = offset
+
+        if limit is not None:
+            params["limit"] = limit
 
         if filters is not None:
             for filter in filters:
