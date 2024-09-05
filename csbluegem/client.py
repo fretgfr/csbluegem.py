@@ -91,7 +91,9 @@ class Client:
         pattern_data: bool = False,
         filters: Optional[Sequence[Filter]] = None,
     ) -> SearchResponse:
-        """Searches for an item on CSBlueGem.
+        """|coro|
+
+        Searches for an item on CSBlueGem.
 
         Parameters
         ----------
@@ -223,7 +225,9 @@ class Client:
         limit: Optional[int] = None,
         filters: Optional[Sequence[Filter]] = None,
     ) -> PatternDataResponse:
-        """Get pattern data for a skin.
+        """|coro|
+
+        Get pattern data for a skin.
 
         Parameters
         ----------
@@ -290,7 +294,9 @@ class Client:
         return PatternDataResponse._from_data(data)
 
     async def pricecheck(self, knife: BlueGemKnife, pattern: int, float: float) -> int:
-        """Runs a price check for an item.
+        """|coro|
+
+        Runs a price check for an item.
 
         Parameters
         ----------
