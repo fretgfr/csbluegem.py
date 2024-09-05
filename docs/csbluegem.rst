@@ -49,7 +49,7 @@ csbluegem.types module
 
 .. class:: Origin
 
-    Where this information comes from.
+    Where a :class:`~csbluegem.types.Sale` originated from.
 
    .. attribute:: Buff
 
@@ -66,7 +66,7 @@ csbluegem.types module
 
 .. class:: FilterType
 
-   What type of filter to apply.
+   What a :class:`~csbluegem.types.Filter` should filter by.
 
    .. attribute:: PlaysideBlue
 
@@ -93,7 +93,7 @@ csbluegem.types module
 
 .. class:: Order
 
-   How to order the results.
+   How results from the API should be ordered.
 
    .. attribute:: Asc
 
@@ -115,7 +115,7 @@ csbluegem.types module
 
 .. class:: Currency
 
-   The currency for prices to be returned in.
+   Available currencies for use in the API."
 
    .. attribute:: USD
 
@@ -140,7 +140,7 @@ csbluegem.types module
 
 .. class:: SortKey
 
-   How to sort returned results.
+   How the results of a query should be sorted.
 
    .. attribute:: PlaysideBlue
 
@@ -187,7 +187,7 @@ csbluegem.types module
 
 .. class:: BlueGemItem
 
-   Available blue gem items.
+   Items that can be queried from the API.
 
    .. attribute:: AK47
 
@@ -264,7 +264,7 @@ csbluegem.types module
 
 .. class:: BlueGemKnife
 
-   Available blue gem knives.
+   Knives that can be queried from the API.
 
    .. attribute:: Bayonet
 
