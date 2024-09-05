@@ -1,14 +1,14 @@
 import asyncio
 from textwrap import dedent
 
-from csbluegem import Client, BlueGemItem
+from csbluegem import BlueGemItem, Client
 
 
 async def main():
     async with Client() as client:
-        pattern_data = await client.pattern_data(BlueGemItem.GutKnife)
+        pdr = await client.pattern_data(BlueGemItem.GutKnife)
 
-        for pd in pattern_data:
+        for pd in pdr.pattern_data:
             s = f"""
                 ### Playside Information
                 Playside Blue: {pd.playside_blue}
