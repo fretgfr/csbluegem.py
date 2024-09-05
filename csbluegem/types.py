@@ -510,6 +510,8 @@ class Filter:
         The maximum value for this filter.
     """
 
+    __slots__ = ("type", "min", "max")
+
     def __init__(self, type: FilterType, min: float, max: float):
         self.type = type
         self.min = min
