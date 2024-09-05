@@ -487,6 +487,8 @@ class Origin(Enum):
 
 
 class FilterType(Enum):
+    """What a :class:`~csbluegem.types.Filter` should filter by."""
+
     # fmt: off
     PlaysideBlue   = "playside_blue"
     PlaysidePurple = "playside_purple"
@@ -522,6 +524,7 @@ class Filter:
 
 
 class Order(Enum):
+    """How query results should be ordered."""
     # fmt: off
     Asc  = "ASC"
     Desc = "DESC"
@@ -529,6 +532,7 @@ class Order(Enum):
 
 
 class ItemType(Enum):
+    """The type of an item."""
     # fmt: off
     StatTrak = "stattrak"
     Normal   = "normal"
@@ -536,6 +540,7 @@ class ItemType(Enum):
 
 
 class Currency(Enum):
+    """Available currencies for use in the API."""
     USD = "USD"
     EUR = "EUR"
     JPY = "JPY"
@@ -546,6 +551,7 @@ class Currency(Enum):
 
 
 class SortKey(Enum):
+    """How the results of a query should be sorted."""
     # fmt: off
     PlaysideBlue          = "playside_blue"
     PlaysidePurple        = "playside_purple"
@@ -565,6 +571,7 @@ class SortKey(Enum):
 
 
 class BlueGemItem(Enum):
+    """Items that can be queried from the API."""
     # fmt: off
     AK47           = "AK-47"
     Bayonet        = "Bayonet"
@@ -594,6 +601,7 @@ class BlueGemItem(Enum):
 
 
 class BlueGemKnife(Enum):
+    """Knives that can be queried from the API."""
     # fmt: off
     Bayonet        = "Bayonet"
     BowieKnife     = "Bowie Knife"
