@@ -330,9 +330,6 @@ csbluegem.utils module
 
 csbluegem.errors module
 ---------------------
-
-.. currentmodule:: zipline.errors
-
 .. autoclass:: csbluegem.errors.BlueGemError
     :members:
     :show-inheritance:
