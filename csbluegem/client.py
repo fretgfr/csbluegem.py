@@ -44,7 +44,7 @@ from .types import (
     SearchResponse,
     SortKey,
 )
-from .utils import _is_valid_float, _is_valid_pattern
+from .utils import _is_valid_pattern, _is_valid_wear
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -79,8 +79,8 @@ class Client:
         pattern: Optional[int] = None,
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
-        float_min: Optional[float] = None,
-        float_max: Optional[float] = None,
+        wear_min: Optional[float] = None,
+        wear_max: Optional[float] = None,
         sort: SortKey = SortKey.Date,
         order: Order = Order.Desc,
         origin: Optional[Origin] = None,
@@ -109,9 +109,9 @@ class Client:
             The minimum price of the sale.
         price_max: Optional[:class:`float`], optional
             The maximum price of the sale.
-        float_min: Optional[:class:`float`], optional
+        wear_min: Optional[:class:`float`], optional
             The minimum float of a returned item.
-        float_max: Optional[:class:`float`], optional
+        wear_max: Optional[:class:`float`], optional
             The maximum float of a returned item.
         sort: :class:`~csbluegem.types.SortKey`, optional
             How should the results be sorted, by default Date.
@@ -170,17 +170,17 @@ class Client:
         if price_max is not None:
             params["price_max"] = price_max
 
-        if float_min is not None:
-            if not _is_valid_float(float_min):
+        if wear_min is not None:
+            if not _is_valid_wear(wear_min):
                 raise BadArgument("float_min is not in range.")
 
-            params["float_min"] = float_min
+            params["wear_min"] = wear_min
 
-        if float_max is not None:
-            if not _is_valid_float(float_max):
+        if wear_max is not None:
+            if not _is_valid_wear(wear_max):
                 raise BadArgument("float_max is not in range.")
 
-            params["float_max"] = float_max
+            params["wear_max"] = wear_max
 
         if origin is not None:
             params["origin"] = origin.value
@@ -293,7 +293,7 @@ class Client:
 
         return PatternDataResponse._from_data(data)
 
-    async def pricecheck(self, knife: BlueGemKnife, pattern: int, float: float) -> int:
+    async def pricecheck(self, knife: BlueGemKnife, pattern: int, wear: float) -> int:
         """|coro|
 
         Runs a price check for an item.
@@ -304,7 +304,7 @@ class Client:
             The knife to price check.
         pattern: :class:`int`
             The pattern of the knife.
-        float: :class:`float`
+        wear: :class:`float`
             The float of the knife
 
         Returns
@@ -326,13 +326,13 @@ class Client:
         if not _is_valid_pattern(pattern):
             raise BadArgument("price check pattern must be 0 <= N <= 1000")
 
-        if not _is_valid_float(float):
+        if not _is_valid_wear(wear):
             raise BadArgument("provided float is invalid.")
 
         params = {
             "skin": knife.value,
             "pattern": pattern,
-            "float": float,
+            "wear": wear,
         }
 
         r = Route("GET", "/pricecheck")

@@ -82,7 +82,7 @@ class _APISearchSaleDict(TypedDict):
     buff_id: int
     date: str
     pattern: int
-    float: float
+    wear: float
     price: float
     epoch: int
     type: str
@@ -340,10 +340,10 @@ class Sale:
         The id of the item on Buff.
     csfloat: :class:`str`
         A link to the item on CSFloat.
-    float: :class:`float`
+    wear: :class:`float`
         The float of the item.
-    type: :class:`str`
-        The type of the item. Can either be "normal" or "stattrak".
+    type: :class:`~csbluegem.types.ItemType`
+        The type of the item.
     pattern: :class:`int`
         The pattern of the item.
     timestamp: :class:`datetime.datetime`
@@ -359,7 +359,7 @@ class Sale:
     __slots__ = (
         "buff_id",
         "csfloat",
-        "_float",
+        "wear",
         "type",
         "pattern",
         "price",
@@ -371,8 +371,8 @@ class Sale:
 
     buff_id: int
     csfloat: str
-    _float: float
-    type: str
+    wear: float
+    type: ItemType
     pattern: int
     price: float
     timestamp: datetime.datetime
@@ -384,8 +384,8 @@ class Sale:
     def _from_data(cls, data: _APISearchSaleDict):
         buff_id = data["buff_id"]
         csfloat = data["csfloat"]
-        _float = data["float"]
-        type = data["type"]
+        wear = data["wear"]
+        type = ItemType(data["type"])
         api_pattern = data["pattern"]
         price = data["price"]
         timestamp = parse_epoch(data["epoch"])
@@ -397,12 +397,12 @@ class Sale:
         raw_screenshots_data: _APISearchScreenshotsDict = data["screenshots"]
         screenshots = Screenshots._from_data(raw_screenshots_data)
 
-        return cls(buff_id, csfloat, _float, type, api_pattern, price, timestamp, origin, pattern_data, screenshots)
+        return cls(buff_id, csfloat, wear, type, api_pattern, price, timestamp, origin, pattern_data, screenshots)
 
     @property
     def float(self):
         """The float of the item."""
-        return self._float
+        return self.wear
 
     @property
     def date(self) -> datetime.date:
@@ -422,7 +422,7 @@ class Sale:
     @property
     def is_stattrak(self) -> bool:
         """Whether the item was stattrak"""
-        return self.type == "stattrak"
+        return self.type is ItemType.StatTrak
 
 
 @dataclass
@@ -568,7 +568,7 @@ class SortKey(Enum):
     BacksideContourBlue   = "backside_contour_blue"
     BacksideContourPurple = "backside_contour_purple"
     Pattern               = "pattern"
-    Float                 = "float"
+    Wear                  = "wear"
     Date                  = "date"
     Price                 = "price"
     # fmt: on
