@@ -11,6 +11,7 @@ async def main():
         for pd in pdr.pattern_data:
             s = f"""
                 ### Playside Information
+                Pattern: {pd.pattern}
                 Playside Blue: {pd.playside_blue}
                 Playside Purple: {pd.playside_purple}
                 Playside Gold: {pd.playside_gold}
