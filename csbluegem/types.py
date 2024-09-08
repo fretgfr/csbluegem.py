@@ -25,7 +25,7 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, NotRequired, Optional, TypedDict
+from typing import List, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
 
@@ -65,9 +65,9 @@ class _APIPatternDataDict(TypedDict):
     playside_contour_purple: float
     playside_gold: float
     playside_purple: float
-    pattern: NotRequired[int]
-    screenshots: NotRequired[_APIPatternDataScreenshots]
-    extra: NotRequired[_APIPatternDataExtras]
+    pattern: int
+    screenshots: _APIPatternDataScreenshots
+    extra: _APIPatternDataExtras
 
 
 class _APISearchScreenshotsDict(TypedDict):
@@ -87,7 +87,7 @@ class _APISearchSaleDict(TypedDict):
     epoch: int
     type: str
     screenshots: _APISearchScreenshotsDict
-    pattern_data: NotRequired[_APIPatternDataDict]
+    pattern_data: _APIPatternDataDict
     csfloat: str
 
 
