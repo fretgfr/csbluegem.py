@@ -83,6 +83,7 @@ def safe_get(dict_: Dict[Any, Any], *keys: Any) -> Optional[Any]:
     """Safely get a nested key from a dictionary.
 
     ex.
+
     .. code-block:: python3
 
         d = {
