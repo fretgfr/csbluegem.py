@@ -85,6 +85,7 @@ class _APISearchSaleDict(TypedDict):
     wear: float
     price: float
     epoch: int
+    steam_inspect_link: str
     type: str
     screenshots: _APISearchScreenshotsDict
     pattern_data: _APIPatternDataDict
@@ -348,6 +349,8 @@ class Sale:
         The pattern of the item.
     timestamp: :class:`datetime.datetime`
         When the sale occurred.
+    steam_inspect_link: :class:`str`
+        The inspect link for this item.
     origin: :class:`~csbluegem.types.SaleOrigin`
         Where the sale data originated.
     pattern_data: Optional[:class:`~csbluegem.types.PatternData`]
@@ -364,6 +367,7 @@ class Sale:
         "pattern",
         "price",
         "timestamp",
+        "steam_inspect_link",
         "origin",
         "pattern_data",
         "screenshots",
@@ -376,6 +380,7 @@ class Sale:
     pattern: int
     price: float
     timestamp: datetime.datetime
+    steam_inspect_link: str
     origin: Origin
     pattern_data: Optional[PatternData]
     screenshots: Screenshots
@@ -389,6 +394,7 @@ class Sale:
         api_pattern = data["pattern"]
         price = data["price"]
         timestamp = parse_epoch(data["epoch"])
+        steam_inspect_link = data["steam_inspect_link"]
         origin = Origin(data["origin"])
 
         raw_pattern_data: Optional[_APIPatternDataDict] = data.get("pattern_data")
@@ -397,7 +403,19 @@ class Sale:
         raw_screenshots_data: _APISearchScreenshotsDict = data["screenshots"]
         screenshots = Screenshots._from_data(raw_screenshots_data)
 
-        return cls(buff_id, csfloat, wear, type, api_pattern, price, timestamp, origin, pattern_data, screenshots)
+        return cls(
+            buff_id,
+            csfloat,
+            wear,
+            type,
+            api_pattern,
+            price,
+            timestamp,
+            steam_inspect_link,
+            origin,
+            pattern_data,
+            screenshots,
+        )
 
     @property
     def float(self):
@@ -483,6 +501,7 @@ class Origin(Enum):
     CSFloat  = "CSFloat"
     SkinBid  = "SkinBid"
     BroSkins = "BroSkins"
+    Skinport = "Skinport"
     # fmt: on
 
 

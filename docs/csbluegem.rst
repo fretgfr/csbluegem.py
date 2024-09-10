@@ -63,6 +63,8 @@ csbluegem.types module
    .. attribute:: BroSkins
 
        BroSkins.com
+   .. attribute:: Skinport
+       Skinport.com
 
 .. class:: FilterType
 
