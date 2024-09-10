@@ -187,7 +187,7 @@ csbluegem.types module
 
        The price of the sale.
 
-.. class:: BlueGemItem
+.. class:: Item
 
    Items that can be queried from the API.
 
@@ -236,71 +236,6 @@ csbluegem.types module
    .. attribute:: MAC10
 
        MAC-10
-   .. attribute:: NavajaKnife
-
-       Navaja Knife
-   .. attribute:: NomadKnife
-
-       Nomad Knife
-   .. attribute:: ParacordKnife
-
-       Paracord Knife
-   .. attribute:: ShadowDaggers
-
-       Shadow Daggers
-   .. attribute:: SkeletonKnife
-
-       Skeleton Knife
-   .. attribute:: StilettoKnife
-
-       Stiletto Knife
-   .. attribute:: SurvivalKnife
-
-       Survival Knife
-   .. attribute:: TalonKnife
-
-       Talon Knife
-   .. attribute:: UrsusKnife
-
-       Ursus Knife
-
-.. class:: BlueGemKnife
-
-   Knives that can be queried from the API.
-
-   .. attribute:: Bayonet
-
-       Bayonet Knife
-   .. attribute:: BowieKnife
-
-       Bowie Knife
-   .. attribute:: ButterflyKnife
-
-       Butterfly Knife
-   .. attribute:: ClassicKnife
-
-       Classic Knife
-   .. attribute:: FalchionKnife
-
-       Falchion Knife
-   .. attribute:: FlipKnife
-
-       Flip Knife
-   .. attribute:: GutKnife
-
-       Gut Knife
-   .. attribute:: HuntsmanKnife
-
-       Huntsman Knife
-   .. attribute:: Karambit
-
-       Karambit Knife
-   .. attribute:: KukriKnife
-
-       Kukri Knife
-   .. attribute:: M9Bayonet
-
-       M9 Bayonet Knife
    .. attribute:: NavajaKnife
 
        Navaja Knife

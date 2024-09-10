@@ -31,8 +31,7 @@ import aiohttp
 from .errors import BadArgument
 from .http import HTTPClient, Route
 from .types import (
-    BlueGemItem,
-    BlueGemKnife,
+    Item,
     Currency,
     Filter,
     ItemType,
@@ -72,7 +71,7 @@ class Client:
 
     async def search(
         self,
-        skin: BlueGemItem,
+        skin: Item,
         /,
         currency: Currency = Currency.USD,
         type: Optional[ItemType] = None,
@@ -97,8 +96,8 @@ class Client:
 
         Parameters
         ----------
-        skin: :class:`~csbluegem.types.BlueGemItem`
-            The skin to search for.
+        item: :class:`~csbluegem.types.Item`
+            The item to search for.
         currency: :class:`~csbluegem.types.Currency`, optional
             The currency to return, by default USD.
         type: Optional[:class:`~csbluegem.types.ItemType`], optional
@@ -215,7 +214,7 @@ class Client:
 
     async def pattern_data(
         self,
-        item: BlueGemItem,
+        item: Item,
         /,
         pattern: Optional[int] = None,
         sort: SortKey = SortKey.Pattern,
@@ -231,8 +230,8 @@ class Client:
 
         Parameters
         ----------
-        item: :class:`~csbluegem.types.BlueGemItem`
-            The skin to get pattern data for.
+        item: :class:`~csbluegem.types.Item`
+            The item to get pattern data for.
         pattern: Optional[:class:`int`], optional
             The pattern to get data for, None for any. By default None
         sort: :class:`~csbluegem.types.SortKey`, optional
@@ -293,19 +292,19 @@ class Client:
 
         return PatternDataResponse._from_data(data)
 
-    async def pricecheck(self, knife: BlueGemKnife, pattern: int, wear: float) -> int:
+    async def pricecheck(self, item: Item, pattern: int, wear: float) -> int:
         """|coro|
 
         Runs a price check for an item.
 
         Parameters
         ----------
-        knife: :class:`~csbluegem.types.BlueGemKnife`
-            The knife to price check.
+        item: :class:`~csbluegem.types.Item`
+            The item to price check.
         pattern: :class:`int`
-            The pattern of the knife.
+            The pattern of the item.
         wear: :class:`float`
-            The float of the knife
+            The float of the item
 
         Returns
         -------
@@ -330,7 +329,7 @@ class Client:
             raise BadArgument("provided float is invalid.")
 
         params = {
-            "skin": knife.value,
+            "skin": item.value,
             "pattern": pattern,
             "wear": wear,
         }

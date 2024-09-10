@@ -6,7 +6,7 @@ import csbluegem
 
 async def main():
     async with csbluegem.Client() as client:
-        r = await client.search(csbluegem.BlueGemItem.M9Bayonet)
+        r = await client.search(csbluegem.Item.FiveSeveN)
 
         for result in r.sales:
             s = f"""
@@ -15,7 +15,7 @@ async def main():
                 Stattrak?: {result.is_stattrak}
                 Price: {result.price:,}
                 Date: {result.timestamp}
-                Origin: {result.origin}
+                Origin: {result.origin.value}
                 Days Since Sale: {result.days_since:,}
                 """
 

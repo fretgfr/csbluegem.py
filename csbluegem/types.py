@@ -44,8 +44,7 @@ __all__ = (
     "ItemType",
     "Currency",
     "SortKey",
-    "BlueGemItem",
-    "BlueGemKnife",
+    "Item",
 )
 
 
@@ -593,7 +592,7 @@ class SortKey(Enum):
     # fmt: on
 
 
-class BlueGemItem(Enum):
+class Item(Enum):
     """Items that can be queried from the API."""
 
     # fmt: off
@@ -612,33 +611,6 @@ class BlueGemItem(Enum):
     KukriKnife     = "Kukri Knife"
     M9Bayonet      = "M9 Bayonet"
     MAC10          = "MAC-10"
-    NavajaKnife    = "Navaja Knife"
-    NomadKnife     = "Nomad Knife"
-    ParacordKnife  = "Paracord Knife"
-    ShadowDaggers  = "Shadow Daggers"
-    SkeletonKnife  = "Skeleton Knife"
-    StilettoKnife  = "Stiletto Knife"
-    SurvivalKnife  = "Survival Knife"
-    TalonKnife     = "Talon Knife"
-    UrsusKnife     = "Ursus Knife"
-    # fmt: on
-
-
-class BlueGemKnife(Enum):
-    """Knives that can be queried from the API."""
-
-    # fmt: off
-    Bayonet        = "Bayonet"
-    BowieKnife     = "Bowie Knife"
-    ButterflyKnife = "Butterfly Knife"
-    ClassicKnife   = "Classic Knife"
-    FalchionKnife  = "Falchion Knife"
-    FlipKnife      = "Flip Knife"
-    GutKnife       = "Gut Knife"
-    HuntsmanKnife  = "Huntsman Knife"
-    Karambit       = "Karambit"
-    KukriKnife     = "Kukri Knife"
-    M9Bayonet      = "M9 Bayonet"
     NavajaKnife    = "Navaja Knife"
     NomadKnife     = "Nomad Knife"
     ParacordKnife  = "Paracord Knife"
