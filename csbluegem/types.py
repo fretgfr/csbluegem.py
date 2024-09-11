@@ -25,9 +25,12 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, TypedDict
+from typing import TYPE_CHECKING, List, Optional, TypedDict
 
 from .utils import parse_epoch, utcnow
+
+if TYPE_CHECKING:
+    from typing_extensions import NotRequired
 
 __all__ = (
     "Screenshots",
@@ -64,9 +67,10 @@ class _APIPatternDataDict(TypedDict):
     playside_contour_purple: float
     playside_gold: float
     playside_purple: float
-    pattern: int
-    screenshots: _APIPatternDataScreenshots
-    extra: _APIPatternDataExtras
+    pattern: NotRequired[int]
+    quantity: NotRequired[int]
+    screenshots: NotRequired[_APIPatternDataScreenshots]
+    extra: NotRequired[_APIPatternDataExtras]
 
 
 class _APISearchScreenshotsDict(TypedDict):
@@ -87,7 +91,7 @@ class _APISearchSaleDict(TypedDict):
     steam_inspect_link: str
     type: str
     screenshots: _APISearchScreenshotsDict
-    pattern_data: _APIPatternDataDict
+    pattern_data: NotRequired[_APIPatternDataDict]
     csfloat: str
 
 
@@ -237,6 +241,14 @@ class PatternData:
         The percentage of gold visible on the play side.
     playside_purple: :class:`float`
         The percentage of purple visible on the play side.
+    pattern: Optional[:class:`int`]
+        The pattern represented by this PatternData.
+    quantity: Optional[:class:`int`]
+        The number of sales attributed to this PatternData.
+    screenshots: Optional[:class:`~csbluegem.types.PatternDataScreenshots`]
+        Example screenshots of the pattern associated with this PatternData on in game items.
+    extra: Optional[:class:`~csbluegem.types.PatternDataExtra`]
+        Extra information about this PatternData.
     """
 
     __slots__ = (
@@ -251,6 +263,7 @@ class PatternData:
         "playside_gold",
         "playside_purple",
         "pattern",
+        "quantity",
         "screenshots",
         "extra",
     )
@@ -266,6 +279,7 @@ class PatternData:
     playside_gold: float
     playside_purple: float
     pattern: Optional[int]
+    quantity: Optional[int]
     screenshots: Optional[PatternDataScreenshots]
     extra: Optional[PatternDataExtra]
 
@@ -282,6 +296,7 @@ class PatternData:
         playside_gold = data["playside_gold"]
         playside_purple = data["playside_purple"]
         pattern = data.get("pattern")
+        quantity = data.get("quantity")
         screenshots_dict = data.get("screenshots")
         extra_dict = data.get("extra")
 
@@ -300,6 +315,7 @@ class PatternData:
             playside_gold,
             playside_purple,
             pattern,
+            quantity,
             screenshots,
             extra,
         )
