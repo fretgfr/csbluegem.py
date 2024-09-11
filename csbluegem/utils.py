@@ -118,9 +118,9 @@ def safe_get(dict_: Dict[Any, Any], *keys: Any) -> Optional[Any]:
     return dict_
 
 
-def _is_valid_pattern(pattern: Optional[int]) -> bool:
+def is_valid_pattern(pattern: Optional[int]) -> bool:
     return 0 <= pattern <= 1000 if pattern is not None else True
 
 
-def _is_valid_wear(flt: float) -> bool:
+def is_valid_wear(flt: float) -> bool:
     return 0.0000000000001 <= flt <= 1

@@ -43,7 +43,7 @@ from .types import (
     SearchResponse,
     SortKey,
 )
-from .utils import _is_valid_pattern, _is_valid_wear
+from .utils import is_valid_pattern, is_valid_wear
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -158,7 +158,7 @@ class Client:
             params["type"] = type.value
 
         if pattern is not None:
-            if not _is_valid_pattern(pattern):
+            if not is_valid_pattern(pattern):
                 raise BadArgument("pattern is invalid.")
 
             params["pattern"] = pattern
@@ -170,13 +170,13 @@ class Client:
             params["price_max"] = price_max
 
         if wear_min is not None:
-            if not _is_valid_wear(wear_min):
+            if not is_valid_wear(wear_min):
                 raise BadArgument("float_min is not in range.")
 
             params["wear_min"] = wear_min
 
         if wear_max is not None:
-            if not _is_valid_wear(wear_max):
+            if not is_valid_wear(wear_max):
                 raise BadArgument("float_max is not in range.")
 
             params["wear_max"] = wear_max
@@ -322,10 +322,10 @@ class Client:
         :class:`~csbluegem.errors.NotFound`
             The search returned no results.
         """
-        if not _is_valid_pattern(pattern):
+        if not is_valid_pattern(pattern):
             raise BadArgument("price check pattern must be 0 <= N <= 1000")
 
-        if not _is_valid_wear(wear):
+        if not is_valid_wear(wear):
             raise BadArgument("provided float is invalid.")
 
         params = {
