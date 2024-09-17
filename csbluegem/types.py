@@ -366,7 +366,7 @@ class Sale:
         When the sale occurred.
     steam_inspect_link: :class:`str`
         The inspect link for this item.
-    origin: :class:`~csbluegem.types.SaleOrigin`
+    origin: :class:`~csbluegem.types.Origin`
         Where the sale data originated.
     pattern_data: Optional[:class:`~csbluegem.types.PatternData`]
         The pattern data for the item, if available.
@@ -518,6 +518,10 @@ class Origin(Enum):
     BroSkins = "BroSkins"
     Skinport = "Skinport"
     # fmt: on
+
+    def __str__(self) -> str:
+        """Returns the value of the member."""
+        return self.value
 
 
 class FilterType(Enum):
