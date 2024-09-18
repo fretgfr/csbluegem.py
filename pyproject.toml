@@ -24,7 +24,7 @@ docs = ["sphinx", "sphinx-rtd-theme"]
 
 [project.urls]
 Homepage = "https://github.com/fretgfr/csbluegem.py/"
-Documentation = "https://csbluegem.readthedocs.io/en/latest/"
+Documentation = "https://csbluegempy.readthedocs.io/en/latest/"
 Issues = "https://github.com/fretgfr/csbluegem.py/issues"
 
 [tool.setuptools]
