@@ -64,7 +64,11 @@ csbluegem.types module
 
        BroSkins.com
    .. attribute:: Skinport
+
        Skinport.com
+   .. attribute:: C5Game
+
+       c5game.com
 
 .. class:: FilterType
 

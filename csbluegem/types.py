@@ -517,6 +517,7 @@ class Origin(Enum):
     SkinBid  = "SkinBid"
     BroSkins = "BroSkins"
     Skinport = "Skinport"
+    C5Game   = "c5game"
     # fmt: on
 
     def __str__(self) -> str:
