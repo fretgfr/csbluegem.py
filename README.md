@@ -22,7 +22,7 @@ async def main():
                 Stattrak?: {result.is_stattrak}
                 Price: {result.price:,}
                 Date: {result.timestamp}
-                Origin: {result.origin.value}
+                Origin: {result.origin}
                 Days Since Sale: {result.days_since:,}
                 """
 
