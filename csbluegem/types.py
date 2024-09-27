@@ -568,6 +568,12 @@ class Filter:
         """
         return (0 <= self.min < 100 and 0 < self.max <= 100) and self.max > self.min
 
+    def __str__(self) -> str:
+        return f"{self.type.value} {self.min}-{self.max}"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} type={self.type} min={self.min} max={self.max}>"
+
 
 class Order(Enum):
     """How query results should be ordered."""
