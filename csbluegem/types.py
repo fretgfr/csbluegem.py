@@ -558,7 +558,14 @@ class Filter:
         self.min = min
         self.max = max
 
-    def _is_valid(self):
+    def is_valid(self) -> bool:
+        """Whether or not this Filter is valid.
+
+        Returns
+        -------
+        :class:`bool`
+            Filter validity.
+        """
         return (0 <= self.min < 100 and 0 < self.max <= 100) and self.max > self.min
 
 

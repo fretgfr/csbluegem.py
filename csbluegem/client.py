@@ -201,7 +201,7 @@ class Client:
 
         if filters:
             for filter in filters:
-                if not filter._is_valid():
+                if not filter.is_valid():
                     raise BadArgument(f"a provided filter is invalid: {filter!r}")
 
                 params[f"{filter.type.value}_min"] = filter.min
@@ -281,7 +281,7 @@ class Client:
 
         if filters is not None:
             for filter in filters:
-                if not filter._is_valid():
+                if not filter.is_valid():
                     raise BadArgument(f"a provided filter is invalid: {filter!r}")
 
                 params[f"{filter.type.value}_min"] = filter.min
