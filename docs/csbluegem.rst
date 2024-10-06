@@ -210,12 +210,18 @@ csbluegem.types module
    .. attribute:: ClassicKnife
 
        Classic Knife
+   .. attribute:: DesertEagle_Heat_Treated
+
+       Desert Eagle Heat Treated
    .. attribute:: FalchionKnife
 
        Falchion Knife
    .. attribute:: FiveSeveN
 
        Five-SeveN
+   .. attribute:: FiveSeveN_Heat_Treated
+
+       Five-SeveN Heat Treated
    .. attribute:: FlipKnife
 
        Flip Knife
