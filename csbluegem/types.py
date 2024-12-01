@@ -148,10 +148,12 @@ class Screenshots:
         return cls(inspect, inspect_playside, inspect_backside)
 
     @property
-    def inspect(self) -> str:
+    def inspect(self) -> Optional[str]:
         """Returns an inspect link no matter where the underlying :class:`~csbluegem.types.Sale` originated.
 
         For CSFloat based Sales, this will return the playside inspect link.
+
+        If no screenshots are available, this property will return None.
         """
 
         if self._inspect:
@@ -160,7 +162,7 @@ class Screenshots:
         if self.inspect_playside:
             return self.inspect_playside
 
-        raise RuntimeError("invalid data was received from the API")
+        return None
 
 
 @dataclass
