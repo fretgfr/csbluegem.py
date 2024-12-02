@@ -123,8 +123,10 @@ class Screenshots:
 
     Attributes
     ----------
-    inspect: :class:`str`
+    inspect: Optional[:class:`str`]
         A url to an inspect link. Always returns a url for an inspect link.
+
+        This will be None if no inspect links are available.
 
         For CSFloat based sales, this returns the playside inspect link.
     inspect_playside: Optional[:class:`str`]
