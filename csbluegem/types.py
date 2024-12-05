@@ -175,8 +175,10 @@ class PatternDataScreenshots:
 
     Attributes
     ----------
-    backside_blue: :class:`float`
-        The percentage of blue visible on the back side.
+    csbluegem_screenshot: :class:`str`
+        A screenshot provided by CSBlueGem
+    aq_oiled: :class:`str`
+        A screenshot provided from another source.
     """
 
     __slots__ = ("csbluegem_screenshot", "aq_oiled")
